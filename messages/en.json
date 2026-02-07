@@ -29,7 +29,8 @@
     "profile": "Profile",
     "recommendations": "Recommendations",
     "reminders": "Reminders",
-    "legal": "Legal Info"
+    "legal": "Legal Info",
+    "stories": "Stories"
   },
   "home": {
     "welcome": "Welcome to FWRA",
@@ -236,6 +237,27 @@
     "version": "Version",
     "feedback": "Send Feedback",
     "help": "Help & Support"
+  },
+  "stories": {
+    "title": "Success Stories",
+    "subtitle": "Real stories from Kenyan farmers who turned waste into value",
+    "totalStories": "Stories",
+    "methodsUsed": "Methods",
+    "counties": "Counties",
+    "allMethods": "All",
+    "methods": {
+      "composting": "Composting",
+      "biogas": "Biogas",
+      "mulching": "Mulching",
+      "animal_feed": "Animal Feed",
+      "vermicompost": "Vermicompost"
+    },
+    "showingResults": "Showing {count} stories",
+    "noStories": "No stories found",
+    "noStoriesDescription": "Try selecting a different method",
+    "ctaTitle": "Have a success story?",
+    "ctaDescription": "Share how farm waste recycling has helped your farm and inspire other farmers.",
+    "ctaContact": "Send your story to stories@fwra.co.ke"
   },
   "wasteTypes": {
     "maize_stalks": "Maize stalks",

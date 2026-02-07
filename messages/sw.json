@@ -29,7 +29,8 @@
     "profile": "Wasifu",
     "recommendations": "Mapendekezo",
     "reminders": "Vikumbusho",
-    "legal": "Sheria"
+    "legal": "Sheria",
+    "stories": "Hadithi"
   },
   "home": {
     "welcome": "Karibu FWRA",
@@ -236,6 +237,27 @@
     "version": "Toleo",
     "feedback": "Tuma Maoni",
     "help": "Msaada"
+  },
+  "stories": {
+    "title": "Hadithi za Mafanikio",
+    "subtitle": "Hadithi halisi kutoka kwa wakulima wa Kenya waliobadilisha taka kuwa thamani",
+    "totalStories": "Hadithi",
+    "methodsUsed": "Njia",
+    "counties": "Kaunti",
+    "allMethods": "Zote",
+    "methods": {
+      "composting": "Mboji",
+      "biogas": "Biogesi",
+      "mulching": "Kufunika Udongo",
+      "animal_feed": "Chakula cha Mifugo",
+      "vermicompost": "Mboji ya Minyoo"
+    },
+    "showingResults": "Inaonyesha hadithi {count}",
+    "noStories": "Hakuna hadithi zilizopatikana",
+    "noStoriesDescription": "Jaribu kuchagua njia tofauti",
+    "ctaTitle": "Una hadithi ya mafanikio?",
+    "ctaDescription": "Shiriki jinsi kuchakata taka za shamba kumesaidia shamba lako na uhamasisha wakulima wengine.",
+    "ctaContact": "Tuma hadithi yako kwa stories@fwra.co.ke"
   },
   "wasteTypes": {
     "maize_stalks": "Mashina ya mahindi",

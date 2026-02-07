@@ -15,7 +15,9 @@ import type * as recommendations from "../recommendations.js";
 import type * as reminders from "../reminders.js";
 import type * as seedData_buyers from "../seedData/buyers.js";
 import type * as seedData_legalDocuments from "../seedData/legalDocuments.js";
+import type * as seedData_successStories from "../seedData/successStories.js";
 import type * as seedData_tutorials from "../seedData/tutorials.js";
+import type * as successStories from "../successStories.js";
 import type * as tutorials from "../tutorials.js";
 import type * as wasteEntries from "../wasteEntries.js";
 
@@ -33,7 +35,9 @@ declare const fullApi: ApiFromModules<{
   reminders: typeof reminders;
   "seedData/buyers": typeof seedData_buyers;
   "seedData/legalDocuments": typeof seedData_legalDocuments;
+  "seedData/successStories": typeof seedData_successStories;
   "seedData/tutorials": typeof seedData_tutorials;
+  successStories: typeof successStories;
   tutorials: typeof tutorials;
   wasteEntries: typeof wasteEntries;
 }>;

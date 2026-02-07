@@ -50,6 +50,12 @@ export function Header() {
             >
               {t("nav.marketplace")}
             </Link>
+            <Link
+              href="/success-stories"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              {t("nav.stories")}
+            </Link>
           </nav>
 
           {/* Right side */}
@@ -102,6 +108,13 @@ export function Header() {
                 className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
               >
                 {t("nav.marketplace")}
+              </Link>
+              <Link
+                href="/success-stories"
+                onClick={() => setIsMenuOpen(false)}
+                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
+              >
+                {t("nav.stories")}
               </Link>
               <Link
                 href="/reminders"

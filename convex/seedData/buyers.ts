@@ -2,18 +2,18 @@
 export const buyerSeedData = [
   // Nairobi Region
   {
-    businessName: "Green Gold Organics",
-    contactPerson: "John Mwangi",
-    phone: "+254712345678",
-    whatsapp: "+254712345678",
-    email: "info@greengold.co.ke",
+    businessName: "Wangari Organics",
+    contactPerson: "Jane Wangui",
+    phone: "0729740142",
+    whatsapp: "0729740142",
+    email: "wangariorganics@gmail.com",
     county: "nairobi",
     subCounty: "Westlands",
-    address: "Westlands Business Park, Nairobi",
+    address: "Kangemi Market, off Waiyaki Way",
     productTypes: ["compost", "vermicompost"],
     description: {
-      en: "Premium organic compost buyer for urban gardens and landscaping companies. We buy in bulk (minimum 500kg).",
-      sw: "Mnunuzi wa mboji bora ya kikaboni kwa bustani za mjini na makampuni ya mandhari. Tunanunua kwa wingi (kilo 500 au zaidi).",
+      en: "We buy compost and vermicompost in bulk for landscaping clients and urban farmers in Nairobi. Minimum 200kg per delivery.",
+      sw: "Tunanunua mboji na mboji ya minyoo kwa wingi kwa wateja wa mandhari na wakulima wa mjini Nairobi. Kilo 200 au zaidi kwa kila usafirishaji.",
     },
     priceRange: {
       en: "KSh 15-25 per kg depending on quality",
@@ -24,18 +24,18 @@ export const buyerSeedData = [
     totalReviews: 23,
   },
   {
-    businessName: "Safari Biogas Solutions",
-    contactPerson: "Grace Wanjiku",
-    phone: "+254723456789",
-    whatsapp: "+254723456789",
-    email: "sales@safaribiogas.co.ke",
+    businessName: "Muturi Gas & Energy",
+    contactPerson: "Patrick Muturi",
+    phone: "0734218905",
+    whatsapp: "0734218905",
+    email: "muturigas@gmail.com",
     county: "nairobi",
     subCounty: "Industrial Area",
-    address: "Enterprise Road, Industrial Area",
+    address: "Lunga Lunga Road, Industrial Area",
     productTypes: ["biogas_slurry", "bio_fertilizer"],
     description: {
-      en: "We purchase biogas slurry and convert it to packaged bio-fertilizer for retail. Consistent supply needed.",
-      sw: "Tunanunua tope la biogesi na kulibadilisha kuwa mbolea ya kibiolojia iliyofungashwa kwa rejareja. Ugavi wa kudumu unahitajika.",
+      en: "We collect biogas slurry and package it as bio-fertilizer for retail. We need consistent weekly supply from farmers.",
+      sw: "Tunakusanya tope la biogesi na kulifungasha kama mbolea ya kibiolojia kwa rejareja. Tunahitaji ugavi wa kila wiki kutoka kwa wakulima.",
     },
     priceRange: {
       en: "KSh 5-8 per liter of slurry",
@@ -48,17 +48,17 @@ export const buyerSeedData = [
 
   // Central Kenya
   {
-    businessName: "Kiambu Organic Farms Coop",
-    contactPerson: "Peter Kamau",
-    phone: "+254734567890",
-    whatsapp: "+254734567890",
+    businessName: "Limuru Organic Growers",
+    contactPerson: "Sarah Wanjiku",
+    phone: "0729519805",
+    whatsapp: "0729519805",
     county: "kiambu",
     subCounty: "Limuru",
-    address: "Limuru Town Center",
+    address: "Opposite Limuru Police Station",
     productTypes: ["compost", "vermicompost", "mulch"],
     description: {
-      en: "Cooperative of 50+ organic farmers seeking quality compost for vegetable production. Regular buyer.",
-      sw: "Ushirika wa wakulima 50+ wa kikaboni wanaotafuta mboji bora kwa uzalishaji wa mboga. Mnunuzi wa kawaida.",
+      en: "A group of 40 organic vegetable farmers in Limuru looking for steady compost supply. We buy every month.",
+      sw: "Kikundi cha wakulima 40 wa mboga za kikaboni Limuru wanaotafuta ugavi wa mboji wa kudumu. Tunanunua kila mwezi.",
     },
     priceRange: {
       en: "KSh 12-20 per kg",
@@ -69,17 +69,17 @@ export const buyerSeedData = [
     totalReviews: 31,
   },
   {
-    businessName: "Thika Farm Supplies",
-    contactPerson: "Samuel Njoroge",
-    phone: "+254745678901",
-    whatsapp: "+254745678901",
+    businessName: "Mbugua Farm Supplies",
+    contactPerson: "Sam Mbugua",
+    phone: "0734632451",
+    whatsapp: "0734632451",
     county: "kiambu",
     subCounty: "Thika",
-    address: "Thika Town, Near Market",
+    address: "Thika Town, behind Makongeni Market",
     productTypes: ["compost", "animal_feed", "mulch"],
     description: {
-      en: "Agricultural supplies shop buying treated maize stover and compost for resale to local farmers.",
-      sw: "Duka la vifaa vya kilimo linalununua mashina ya mahindi yaliyotibiwa na mboji kwa kuuza tena kwa wakulima wa ndani.",
+      en: "Agro-vet shop buying treated maize stover and compost. We resell to small-scale farmers around Thika.",
+      sw: "Duka la kilimo linalununua mashina ya mahindi yaliyotibiwa na mboji. Tunauza tena kwa wakulima wadogo karibu na Thika.",
     },
     priceRange: {
       en: "KSh 10-15 per kg compost, KSh 5-8 per kg treated stover",
@@ -92,18 +92,18 @@ export const buyerSeedData = [
 
   // Rift Valley
   {
-    businessName: "Nakuru Green Energy",
-    contactPerson: "James Korir",
-    phone: "+254756789012",
-    whatsapp: "+254756789012",
-    email: "info@nakurugreen.co.ke",
+    businessName: "Kipchoge Energy Systems",
+    contactPerson: "Amos Kipchoge",
+    phone: "0722583091",
+    whatsapp: "0722583091",
+    email: "kipchogenergy@gmail.com",
     county: "nakuru",
     subCounty: "Nakuru Town East",
-    address: "Nakuru Industrial Park",
+    address: "Lanet Road, near Egerton turn-off",
     productTypes: ["biogas_slurry", "bio_fertilizer"],
     description: {
-      en: "Large-scale biogas facility buying cow dung and pig manure for energy production. Daily collection available.",
-      sw: "Kituo kikubwa cha biogesi kinachonunua kinyesi cha ng'ombe na nguruwe kwa uzalishaji wa nishati. Ukusanyaji wa kila siku unapatikana.",
+      en: "Biogas facility buying cow dung and pig manure for energy production. We can collect from your farm daily.",
+      sw: "Kituo cha biogesi kinachonunua kinyesi cha ng'ombe na nguruwe kwa uzalishaji wa nishati. Tunaweza kukusanya kutoka shambani kwako kila siku.",
     },
     priceRange: {
       en: "KSh 2-4 per kg fresh manure (we collect)",
@@ -114,17 +114,17 @@ export const buyerSeedData = [
     totalReviews: 27,
   },
   {
-    businessName: "Eldoret Dairy Feeds",
-    contactPerson: "Mary Chemutai",
-    phone: "+254767890123",
-    whatsapp: "+254767890123",
+    businessName: "Chebet Dairy Feeds",
+    contactPerson: "Mary Chebet",
+    phone: "0724109876",
+    whatsapp: "0724109876",
     county: "uasin_gishu",
     subCounty: "Eldoret East",
-    address: "Eldoret Town",
+    address: "Uganda Road, Eldoret Town",
     productTypes: ["animal_feed", "silage"],
     description: {
-      en: "Dairy farmers cooperative buying silage and treated crop residues. Large volumes needed during dry season.",
-      sw: "Ushirika wa wafugaji wa ng'ombe wa maziwa unaonunua silaji na mabaki ya mazao yaliyotibiwa. Kiasi kikubwa kinahitajika wakati wa msimu wa kiangazi.",
+      en: "Dairy farmers group buying silage and treated crop residues. We need large volumes especially during dry season.",
+      sw: "Kikundi cha wafugaji wa maziwa kinachonunua silaji na mabaki ya mazao yaliyotibiwa. Tunahitaji kiasi kikubwa hasa wakati wa kiangazi.",
     },
     priceRange: {
       en: "KSh 8-12 per kg silage, KSh 5-8 per kg treated stover",
@@ -137,17 +137,17 @@ export const buyerSeedData = [
 
   // Western Kenya
   {
-    businessName: "Kisumu Organic Markets",
-    contactPerson: "Otieno Ochieng",
-    phone: "+254778901234",
-    whatsapp: "+254778901234",
+    businessName: "Otieno & Sons Farm Produce",
+    contactPerson: "Kevin Otieno",
+    phone: "0711294857",
+    whatsapp: "0711294857",
     county: "kisumu",
     subCounty: "Kisumu Central",
-    address: "Kisumu City Market Area",
+    address: "Oginga Odinga Street, Kisumu",
     productTypes: ["compost", "vermicompost"],
     description: {
-      en: "Organic produce market seeking quality compost for our partner farmers. Certification assistance available.",
-      sw: "Soko la mazao ya kikaboni linlotafuta mboji bora kwa wakulima wetu washirika. Msaada wa vyeti unapatikana.",
+      en: "We supply organic farmers around Kisumu with quality compost. Also helping farmers get organic certification.",
+      sw: "Tunasambazia wakulima wa kikaboni karibu na Kisumu mboji bora. Pia tunasaidia wakulima kupata vyeti vya kikaboni.",
     },
     priceRange: {
       en: "KSh 15-22 per kg for certified organic compost",
@@ -158,17 +158,17 @@ export const buyerSeedData = [
     totalReviews: 19,
   },
   {
-    businessName: "Lake Region Feeds",
-    contactPerson: "Rose Akinyi",
-    phone: "+254789012345",
-    whatsapp: "+254789012345",
+    businessName: "Achieng Feeds Mill",
+    contactPerson: "Rose Achieng",
+    phone: "0728451036",
+    whatsapp: "0728451036",
     county: "kisumu",
     subCounty: "Kisumu West",
-    address: "Along Kisumu-Kakamega Road",
+    address: "Along Kisumu-Kakamega Road, past Mamboleo",
     productTypes: ["animal_feed", "silage"],
     description: {
-      en: "Feed mill buying rice husks, maize bran, and quality silage for poultry and dairy feed production.",
-      sw: "Kiwanda cha chakula cha mifugo kinachonunua maganda ya mpunga, pumba za mahindi, na silaji bora kwa uzalishaji wa chakula cha kuku na ng'ombe.",
+      en: "Feed mill buying rice husks, maize bran, and silage for poultry and dairy feed. We buy all year round.",
+      sw: "Kiwanda cha chakula cha mifugo kinachonunua maganda ya mpunga, pumba za mahindi, na silaji kwa chakula cha kuku na ng'ombe. Tunanunua mwaka mzima.",
     },
     priceRange: {
       en: "KSh 3-5 per kg rice husks, KSh 6-10 per kg silage",
@@ -181,18 +181,18 @@ export const buyerSeedData = [
 
   // Coast Region
   {
-    businessName: "Mombasa Horticulture Supplies",
-    contactPerson: "Hassan Omar",
-    phone: "+254790123456",
-    whatsapp: "+254790123456",
-    email: "mhsupplies@gmail.com",
+    businessName: "Omar Horticulture",
+    contactPerson: "Hassan Abdalla",
+    phone: "0738502914",
+    whatsapp: "0738502914",
+    email: "omarhorti@gmail.com",
     county: "mombasa",
     subCounty: "Mvita",
-    address: "Mombasa Town, Near Port",
+    address: "Mwembe Tayari, near Mombasa Town Hall",
     productTypes: ["compost", "mulch", "vermicompost"],
     description: {
-      en: "Supplying hotels and resorts with organic compost for landscaping. Premium prices for quality product.",
-      sw: "Kusambaza hoteli na mapumziko na mboji ya kikaboni kwa mandhari. Bei za juu kwa bidhaa bora.",
+      en: "We supply hotels and residential estates with organic compost for gardens. Good prices for quality product.",
+      sw: "Tunasambazia hoteli na maeneo ya makazi mboji ya kikaboni kwa bustani. Bei nzuri kwa bidhaa bora.",
     },
     priceRange: {
       en: "KSh 20-30 per kg for premium compost",
@@ -203,17 +203,17 @@ export const buyerSeedData = [
     totalReviews: 12,
   },
   {
-    businessName: "Kilifi Eco Farms",
-    contactPerson: "Fatma Bakari",
-    phone: "+254701234567",
-    whatsapp: "+254701234567",
+    businessName: "Kazungu Mixed Farming",
+    contactPerson: "Bakari Kazungu",
+    phone: "0720873416",
+    whatsapp: "0720873416",
     county: "kilifi",
     subCounty: "Kilifi South",
-    address: "Kilifi Town",
+    address: "Mtwapa-Kilifi Road, past Kilifi Bridge",
     productTypes: ["compost", "bio_fertilizer", "mulch"],
     description: {
-      en: "Organic cashew and coconut farm buying compost and mulching materials. Seasonal buyer.",
-      sw: "Shamba la korosho na nazi la kikaboni linalununua mboji na vifaa vya kufunika. Mnunuzi wa msimu.",
+      en: "Cashew and coconut farm that buys compost and mulch. We buy more during planting season, March-May.",
+      sw: "Shamba la korosho na nazi linalununua mboji na vifuniko. Tunanunua zaidi wakati wa kupanda, Machi-Mei.",
     },
     priceRange: {
       en: "KSh 12-18 per kg",
@@ -226,17 +226,17 @@ export const buyerSeedData = [
 
   // Mount Kenya Region
   {
-    businessName: "Nyeri Coffee Farmers Coop",
-    contactPerson: "Paul Maina",
-    phone: "+254712098765",
-    whatsapp: "+254712098765",
+    businessName: "Nyeri Hill Coffee Coop",
+    contactPerson: "Francis Maina",
+    phone: "0726381054",
+    whatsapp: "0726381054",
     county: "nyeri",
     subCounty: "Nyeri Central",
-    address: "Nyeri Town",
+    address: "Chaka Road, Nyeri Town",
     productTypes: ["compost", "vermicompost", "coffee_pulp_compost"],
     description: {
-      en: "Coffee cooperative buying quality compost for organic coffee production. Can trade coffee pulp for finished compost.",
-      sw: "Ushirika wa kahawa unaonunua mboji bora kwa uzalishaji wa kahawa ya kikaboni. Tunaweza kubadilishana maganda ya kahawa kwa mboji iliyokamilika.",
+      en: "Coffee cooperative that buys compost for organic coffee farming. We also swap coffee pulp for finished compost.",
+      sw: "Ushirika wa kahawa unaonunua mboji kwa kilimo cha kahawa ya kikaboni. Tunabadilishana maganda ya kahawa kwa mboji iliyokamilika.",
     },
     priceRange: {
       en: "KSh 18-25 per kg or pulp exchange",
@@ -247,17 +247,17 @@ export const buyerSeedData = [
     totalReviews: 20,
   },
   {
-    businessName: "Meru Agrovet",
-    contactPerson: "Michael Mwiti",
-    phone: "+254723098765",
-    whatsapp: "+254723098765",
+    businessName: "Gitonga Agrovet",
+    contactPerson: "Lucy Kagendo",
+    phone: "0733147290",
+    whatsapp: "0733147290",
     county: "meru",
     subCounty: "Meru Central",
-    address: "Meru Town Center",
+    address: "Njuri Ncheke Street, Meru Town",
     productTypes: ["animal_feed", "compost", "silage"],
     description: {
-      en: "Agricultural shop buying various farm products including treated feeds and compost for retail.",
-      sw: "Duka la kilimo linalununua bidhaa mbalimbali za shamba ikiwa ni pamoja na vyakula vilivyotibiwa na mboji kwa rejareja.",
+      en: "Agrovet shop buying treated feeds and compost to sell to local farmers in Meru and Tharaka Nithi.",
+      sw: "Duka la kilimo linalununua vyakula vilivyotibiwa na mboji kuuza kwa wakulima wa Meru na Tharaka Nithi.",
     },
     priceRange: {
       en: "KSh 8-15 per kg depending on product",
@@ -270,17 +270,17 @@ export const buyerSeedData = [
 
   // Trans Nzoia / Kitale
   {
-    businessName: "Kitale Maize Processors",
+    businessName: "Wanyama Feeds & Grain",
     contactPerson: "Joseph Wanyama",
-    phone: "+254734098765",
-    whatsapp: "+254734098765",
+    phone: "0721056832",
+    whatsapp: "0721056832",
     county: "trans_nzoia",
     subCounty: "Kitale",
-    address: "Kitale Town Industrial Area",
+    address: "Kitale Town, near Bongo Market",
     productTypes: ["animal_feed", "silage"],
     description: {
-      en: "Large-scale animal feed producer buying maize stover and silage. Consistent supply contracts available.",
-      sw: "Mzalishaji mkubwa wa chakula cha mifugo anayenunua mashina ya mahindi na silaji. Mikataba ya ugavi wa kudumu inapatikana.",
+      en: "Animal feed producer buying maize stover and silage. We offer supply contracts for consistent sellers.",
+      sw: "Mzalishaji wa chakula cha mifugo anayenunua mashina ya mahindi na silaji. Tunatoa mikataba kwa wauzaji wa kudumu.",
     },
     priceRange: {
       en: "KSh 4-7 per kg with contracts",
@@ -293,17 +293,17 @@ export const buyerSeedData = [
 
   // Machakos
   {
-    businessName: "Machakos Green Solutions",
-    contactPerson: "Catherine Mueni",
-    phone: "+254745098765",
-    whatsapp: "+254745098765",
+    businessName: "Mutua Green Farm",
+    contactPerson: "Catherine Nduku",
+    phone: "0725690341",
+    whatsapp: "0725690341",
     county: "machakos",
     subCounty: "Machakos Town",
-    address: "Machakos Town",
+    address: "Machakos Town, behind KCB Bank",
     productTypes: ["compost", "bio_fertilizer"],
     description: {
-      en: "Social enterprise supporting local farmers with organic inputs. Fair prices and training included.",
-      sw: "Biashara ya kijamii inayosaidia wakulima wa ndani na pembejeo za kikaboni. Bei za haki na mafunzo yanajumuishwa.",
+      en: "Social enterprise helping farmers in Ukambani with organic inputs. Fair prices and we also do free training.",
+      sw: "Biashara ya kijamii inayosaidia wakulima wa Ukambani na pembejeo za kikaboni. Bei za haki na pia tunatoa mafunzo bure.",
     },
     priceRange: {
       en: "KSh 12-18 per kg plus training support",
@@ -316,17 +316,17 @@ export const buyerSeedData = [
 
   // Kajiado
   {
-    businessName: "Maasai Organic Ranches",
-    contactPerson: "Daniel Ole Parsitau",
-    phone: "+254756098765",
-    whatsapp: "+254756098765",
+    businessName: "Nchoe Livestock Feeds",
+    contactPerson: "Daniel Nchoe",
+    phone: "0737410285",
+    whatsapp: "0737410285",
     county: "kajiado",
     subCounty: "Kajiado Central",
-    address: "Kajiado Town",
+    address: "Kajiado Town, next to Isinya Road junction",
     productTypes: ["animal_feed", "silage", "mulch"],
     description: {
-      en: "Cattle ranch buying supplementary feeds and fodder, especially during drought periods.",
-      sw: "Shamba la ng'ombe linalununua vyakula vya ziada na lishe, hasa wakati wa ukame.",
+      en: "Cattle ranch buying supplementary feeds and fodder. During drought we buy anything available.",
+      sw: "Shamba la ng'ombe linalununua vyakula vya ziada na lishe. Wakati wa ukame tunanunua chochote kinachopatikana.",
     },
     priceRange: {
       en: "KSh 6-10 per kg",

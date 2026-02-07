@@ -1,0 +1,1 @@
+export { SuccessStoryCard } from "./SuccessStoryCard";
