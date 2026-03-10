@@ -7,7 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { StepViewer } from "@/components/tutorials";
 import { Link } from "@/lib/i18n/navigation";
 import { Badge, Button } from "@/components/ui";
-import { ChevronLeft, Clock, BookOpen, Eye, Bell, Loader2 } from "lucide-react";
+import { CaretLeft as ChevronLeft, Clock, BookOpen, Eye, Bell, CircleNotch as Loader2 } from "@phosphor-icons/react";
 
 interface TutorialDetailClientProps {
   slug: string;
@@ -39,7 +39,7 @@ export function TutorialDetailClient({ slug }: TutorialDetailClientProps) {
     return (
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
         <div className="mx-auto max-w-2xl flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+          <Loader2 weight="duotone" className="h-8 w-8 animate-spin text-green-600" />
         </div>
       </main>
     );
@@ -83,7 +83,7 @@ export function TutorialDetailClient({ slug }: TutorialDetailClientProps) {
           href={`/tutorials/${tutorial.category}`}
           className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft weight="duotone" className="h-4 w-4" />
           {t("common.back")}
         </Link>
 
@@ -115,17 +115,17 @@ export function TutorialDetailClient({ slug }: TutorialDetailClientProps) {
             </Badge>
 
             <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-              <Clock className="h-4 w-4" />
+              <Clock weight="duotone" className="h-4 w-4" />
               {tutorial.duration}
             </span>
 
             <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-              <BookOpen className="h-4 w-4" />
+              <BookOpen weight="duotone" className="h-4 w-4" />
               {tutorial.steps.length} {t("tutorials.steps")}
             </span>
 
             <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-              <Eye className="h-4 w-4" />
+              <Eye weight="duotone" className="h-4 w-4" />
               {tutorial.viewCount} views
             </span>
           </div>
@@ -153,7 +153,7 @@ export function TutorialDetailClient({ slug }: TutorialDetailClientProps) {
           </p>
           <Link href="/reminders">
             <Button>
-              <Bell className="h-4 w-4" />
+              <Bell weight="duotone" className="h-4 w-4" />
               {t("recommendations.setReminder")}
             </Button>
           </Link>

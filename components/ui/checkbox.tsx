@@ -2,7 +2,7 @@
 
 import { forwardRef, type InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
+import { Check } from "@phosphor-icons/react";
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
@@ -40,7 +40,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               "group-hover:border-green-500 dark:group-hover:border-green-400"
             )}
           >
-            <Check className="h-3.5 w-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+            <Check weight="bold" className="h-3.5 w-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
           </div>
         </div>
         {(label || description) && (

@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { Card, Badge } from "@/components/ui";
-import { MapPin, Quote } from "lucide-react";
+import { MapPin, Quotes as Quote } from "@phosphor-icons/react";
 import type { Doc } from "@/convex/_generated/dataModel";
 
 interface SuccessStoryCardProps {
@@ -41,7 +41,7 @@ export function SuccessStoryCard({ story }: SuccessStoryCardProps) {
             {story.farmerName}
           </h3>
           <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-            <MapPin className="h-3.5 w-3.5" />
+            <MapPin weight="duotone" className="h-3.5 w-3.5" />
             <span className="capitalize">{story.county.replace(/_/g, " ")}</span>
           </div>
         </div>
@@ -53,7 +53,7 @@ export function SuccessStoryCard({ story }: SuccessStoryCardProps) {
       {/* Story */}
       <div className="mb-3">
         <div className="flex gap-2">
-          <Quote className="h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5" />
+          <Quote weight="duotone" className="h-4 w-4 text-gray-300 dark:text-gray-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {storyText}
           </p>

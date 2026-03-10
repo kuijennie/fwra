@@ -7,7 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { SuccessStoryCard } from "@/components/success-stories";
 import { Badge } from "@/components/ui";
 import { Skeleton } from "@/components/ui";
-import { Award, MapPin, Leaf } from "lucide-react";
+import { Trophy as Award, MapPin, Leaf } from "@phosphor-icons/react";
 
 const methods = ["all", "composting", "biogas", "mulching", "animal_feed", "vermicompost"] as const;
 
@@ -38,7 +38,7 @@ export function SuccessStoriesClient() {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <Award className="h-7 w-7 text-green-600" />
+            <Award weight="duotone" className="h-7 w-7 text-green-600" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {t("stories.title")}
             </h1>
@@ -52,7 +52,7 @@ export function SuccessStoriesClient() {
         {stories && (
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-              <Award className="h-5 w-5 text-green-600 mx-auto mb-1" />
+              <Award weight="duotone" className="h-5 w-5 text-green-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stories.length}
               </div>
@@ -61,7 +61,7 @@ export function SuccessStoriesClient() {
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-              <Leaf className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+              <Leaf weight="duotone" className="h-5 w-5 text-blue-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {uniqueMethods}
               </div>
@@ -70,7 +70,7 @@ export function SuccessStoriesClient() {
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-              <MapPin className="h-5 w-5 text-purple-600 mx-auto mb-1" />
+              <MapPin weight="duotone" className="h-5 w-5 text-purple-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {uniqueCounties}
               </div>

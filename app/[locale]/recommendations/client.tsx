@@ -5,24 +5,41 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RecommendationList } from "@/components/recommendations";
 import { useSession } from "@/lib/hooks";
-import { Link } from "@/lib/i18n/navigation";
+import { Link, useRouter } from "@/lib/i18n/navigation";
 import { Button } from "@/components/ui";
-import { Loader2, Plus } from "lucide-react";
+import { CircleNotch as Loader2, Plus } from "@phosphor-icons/react";
 import type { Id } from "@/convex/_generated/dataModel";
+
+// Map method IDs to tutorial category slugs
+const methodToCategoryMap: Record<string, string> = {
+  composting: "composting",
+  biogas: "biogas",
+  mulching: "mulching",
+  animal_feed: "animal_feed",
+  vermicompost: "composting", // vermicompost tutorials live under composting
+};
 
 export function RecommendationsPageClient() {
   const t = useTranslations();
+  const router = useRouter();
   const { sessionId, isLoading: sessionLoading } = useSession();
 
   const recommendations = useQuery(
-    api.recommendations.getRecent,
-    sessionId ? { sessionId, limit: 10 } : "skip"
+    api.recommendations.getLatest,
+    sessionId ? { sessionId } : "skip"
   );
 
   const selectRecommendation = useMutation(api.recommendations.select);
 
   const handleSelect = async (id: Id<"recommendations">) => {
     await selectRecommendation({ id });
+
+    // Find the selected recommendation to get its method
+    const selected = recommendations?.find((r) => r._id === id);
+    if (selected) {
+      const category = methodToCategoryMap[selected.method] || selected.method;
+      router.push(`/tutorials/${category}`);
+    }
   };
 
   const isLoading = sessionLoading || recommendations === undefined;
@@ -42,7 +59,7 @@ export function RecommendationsPageClient() {
 
           <Link href="/waste-input">
             <Button variant="outline" size="sm">
-              <Plus className="h-4 w-4" />
+              <Plus weight="bold" className="h-4 w-4" />
               {t("nav.logWaste")}
             </Button>
           </Link>
@@ -50,7 +67,7 @@ export function RecommendationsPageClient() {
 
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[300px]">
-            <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+            <Loader2 weight="duotone" className="h-8 w-8 animate-spin text-green-600" />
           </div>
         ) : (
           <RecommendationList
@@ -64,7 +81,7 @@ export function RecommendationsPageClient() {
           <div className="mt-6 text-center">
             <Link href="/waste-input">
               <Button size="lg">
-                <Plus className="h-5 w-5" />
+                <Plus weight="bold" className="h-5 w-5" />
                 {t("home.logWasteAction")}
               </Button>
             </Link>

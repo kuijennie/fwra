@@ -1,13 +1,13 @@
 "use client";
 
-import { WifiOff } from "lucide-react";
+import { WifiSlash as WifiOff } from "@phosphor-icons/react";
 
 export default function OfflinePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="text-center max-w-md">
         <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <WifiOff className="w-12 h-12 text-gray-400" />
+          <WifiOff weight="duotone" className="w-12 h-12 text-gray-400" />
         </div>
 
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">

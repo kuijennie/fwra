@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Card, Badge, Button } from "@/components/ui";
-import { Phone, MessageCircle, MapPin, Star, CheckCircle } from "lucide-react";
+import { Phone, ChatCircle as MessageCircle, MapPin, Star, CheckCircle } from "@phosphor-icons/react";
 import type { Doc } from "@/convex/_generated/dataModel";
 
 interface BuyerCardProps {
@@ -54,7 +54,7 @@ export function BuyerCard({ buyer, onContact }: BuyerCardProps) {
               {buyer.businessName}
             </h3>
             {buyer.isVerified && (
-              <CheckCircle className="h-4 w-4 text-green-600" />
+              <CheckCircle weight="duotone" className="h-4 w-4 text-green-600" />
             )}
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -63,7 +63,7 @@ export function BuyerCard({ buyer, onContact }: BuyerCardProps) {
         </div>
         {buyer.rating && (
           <div className="flex items-center gap-1 text-yellow-500">
-            <Star className="h-4 w-4 fill-current" />
+            <Star weight="duotone" className="h-4 w-4 fill-current" />
             <span className="text-sm font-medium">{buyer.rating.toFixed(1)}</span>
             <span className="text-xs text-gray-400">({buyer.reviewCount})</span>
           </div>
@@ -71,7 +71,7 @@ export function BuyerCard({ buyer, onContact }: BuyerCardProps) {
       </div>
 
       <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 mb-3">
-        <MapPin className="h-4 w-4" />
+        <MapPin weight="duotone" className="h-4 w-4" />
         <span className="capitalize">{buyer.county.replace(/_/g, " ")}</span>
         {buyer.subCounty && <span>, {buyer.subCounty}</span>}
       </div>
@@ -106,7 +106,7 @@ export function BuyerCard({ buyer, onContact }: BuyerCardProps) {
           className="flex-1"
           onClick={handleCall}
         >
-          <Phone className="h-4 w-4" />
+          <Phone weight="duotone" className="h-4 w-4" />
           {t("marketplace.call")}
         </Button>
         {buyer.whatsapp && (
@@ -116,7 +116,7 @@ export function BuyerCard({ buyer, onContact }: BuyerCardProps) {
             className="flex-1 bg-green-600 hover:bg-green-700"
             onClick={handleWhatsApp}
           >
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle weight="duotone" className="h-4 w-4" />
             WhatsApp
           </Button>
         )}

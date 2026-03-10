@@ -5,6 +5,7 @@ import { locales } from "@/lib/i18n/config";
 import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SkipLink } from "@/components/accessibility";
+import { ChatWidget } from "@/components/chat/chat-widget";
 
 type Props = {
   children: React.ReactNode;
@@ -35,6 +36,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           {children}
         </main>
         <MobileNav />
+        <ChatWidget />
       </div>
     </NextIntlClientProvider>
   );

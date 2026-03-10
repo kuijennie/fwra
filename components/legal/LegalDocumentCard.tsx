@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Card, Badge } from "@/components/ui";
-import { FileText, ChevronRight, Calendar } from "lucide-react";
+import { FileText, CaretRight as ChevronRight, CalendarBlank as Calendar } from "@phosphor-icons/react";
 import type { Doc } from "@/convex/_generated/dataModel";
 
 interface LegalDocumentCardProps {
@@ -54,7 +54,7 @@ export function LegalDocumentCard({ document }: LegalDocumentCardProps) {
 
             {document.effectiveDate && (
               <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                <Calendar className="h-3 w-3" />
+                <Calendar weight="duotone" className="h-3 w-3" />
                 <span>
                   {locale === "sw" ? "Kuanzia" : "Effective"}: {document.effectiveDate}
                 </span>
@@ -63,7 +63,7 @@ export function LegalDocumentCard({ document }: LegalDocumentCardProps) {
           </div>
 
           {/* Arrow */}
-          <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0" />
+          <ChevronRight weight="duotone" className="h-5 w-5 text-gray-400 flex-shrink-0" />
         </div>
       </Card>
     </Link>

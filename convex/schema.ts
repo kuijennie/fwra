@@ -4,9 +4,11 @@ import { v } from "convex/values";
 export default defineSchema({
   // Users table (optional accounts for data sync)
   users: defineTable({
+    clerkId: v.optional(v.string()),
     name: v.string(),
     phone: v.optional(v.string()),
     email: v.optional(v.string()),
+    role: v.string(), // 'farmer' | 'buyer' | 'admin'
     county: v.string(),
     subCounty: v.optional(v.string()),
     preferredLanguage: v.string(), // 'en', 'sw', 'ki', 'lu', 'ka'
@@ -15,7 +17,9 @@ export default defineSchema({
     lastActive: v.number(),
   })
     .index("by_county", ["county"])
-    .index("by_language", ["preferredLanguage"]),
+    .index("by_language", ["preferredLanguage"])
+    .index("by_clerk_id", ["clerkId"])
+    .index("by_role", ["role"]),
 
   // Waste entries logged by farmers
   wasteEntries: defineTable({
@@ -157,6 +161,7 @@ export default defineSchema({
 
   // Marketplace buyers directory
   buyers: defineTable({
+    userId: v.optional(v.id("users")),
     businessName: v.string(),
     contactPerson: v.string(),
     phone: v.string(),

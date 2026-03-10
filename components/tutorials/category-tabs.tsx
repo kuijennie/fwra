@@ -1,15 +1,23 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+import {
+  SquaresFour,
+  Plant,
+  Fire,
+  Leaf,
+  Barn,
+  ArrowsCounterClockwise,
+  type Icon,
+} from "@phosphor-icons/react";
 
-const categories = [
-  { id: "all", labelKey: "tutorials.all", icon: "📚" },
-  { id: "composting", labelKey: "tutorials.composting", icon: "🌱" },
-  { id: "biogas", labelKey: "tutorials.biogas", icon: "🔥" },
-  { id: "mulching", labelKey: "tutorials.mulching", icon: "🍂" },
-  { id: "animal_feed", labelKey: "tutorials.animalFeed", icon: "🐄" },
-  { id: "vermicompost", labelKey: "recommendations.vermicompost", icon: "🪱" },
+const categories: { id: string; labelKey: string; Icon: Icon }[] = [
+  { id: "all",          labelKey: "tutorials.all",                Icon: SquaresFour },
+  { id: "composting",   labelKey: "tutorials.composting",         Icon: Plant },
+  { id: "biogas",       labelKey: "tutorials.biogas",             Icon: Fire },
+  { id: "mulching",     labelKey: "tutorials.mulching",           Icon: Leaf },
+  { id: "animal_feed",  labelKey: "tutorials.animalFeed",         Icon: Barn },
+  { id: "vermicompost", labelKey: "recommendations.vermicompost", Icon: ArrowsCounterClockwise },
 ];
 
 interface CategoryTabsProps {
@@ -29,14 +37,14 @@ export function CategoryTabs({
         <button
           key={category.id}
           onClick={() => onCategoryChange(category.id)}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all"
+          style={
             selectedCategory === category.id
-              ? "bg-green-600 text-white"
-              : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-          )}
+              ? { background: "var(--brand)", color: "white" }
+              : { background: "var(--brand-50)", color: "var(--foreground-muted)" }
+          }
         >
-          <span>{category.icon}</span>
+          <category.Icon weight="duotone" className="h-4 w-4" />
           <span>{t(category.labelKey)}</span>
         </button>
       ))}

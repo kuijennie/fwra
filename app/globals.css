@@ -1,42 +1,198 @@
 @import "tailwindcss";
 
+/* Override Tailwind's built-in dark variant to use class-based (next-themes)
+   instead of @media (prefers-color-scheme: dark) */
+@variant dark (&:is(.dark *));
+
+/* ================================================
+   FWRA — Msitu Design System
+   Primary: #06402B (Forest Green — the only hue)
+   ================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #22c55e;
-  --primary-dark: #16a34a;
+  /* Brand scale — single hue, multiple stops */
+  --brand:        #06402B;
+  --brand-hover:  #0a5c3d;
+  --brand-active: #052e1f;
+  --brand-mid:    #1a6b42;
+  --brand-muted:  #5a9e7c;
+
+  /* Surface tints */
+  --brand-50:  #f2f8f5;
+  --brand-100: #e0f0e8;
+  --brand-200: #b6d9c6;
+  --brand-300: #7db89a;
+
+  /* Page */
+  --background:       #f6faf7;
+  --surface:          #ffffff;
+  --foreground:       #0c1f15;
+  --foreground-muted: #4a6b58;
+  --border:           #cde0d6;
+
+  /* Aliases for Tailwind @theme */
+  --primary:      var(--brand);
+  --primary-dark: var(--brand-active);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
+  --color-background:   var(--background);
+  --color-foreground:   var(--foreground);
+  --color-primary:      var(--primary);
   --color-primary-dark: var(--primary-dark);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand:        var(--brand);
+  --color-brand-50:     var(--brand-50);
+  --color-brand-100:    var(--brand-100);
+  --color-brand-200:    var(--brand-200);
+  --color-brand-300:    var(--brand-300);
+  --color-brand-mid:    var(--brand-mid);
+  --color-brand-muted:  var(--brand-muted);
+  --color-surface:      var(--surface);
+  --color-border:       var(--border);
+  --font-sans:          var(--font-dm-sans);
+  --font-display:       var(--font-playfair);
+  --font-mono:          var(--font-geist-mono);
+
+  /* ── Remap ALL Tailwind color families → brand green scale ──
+     Every bg-green-*, bg-amber-*, bg-blue-*, bg-purple-*, bg-orange-*
+     etc. across the entire codebase now resolves to our single hue. */
+
+  /* green — the main brand */
+  --color-green-50:   #f2f8f5;
+  --color-green-100:  #e0f0e8;
+  --color-green-200:  #b6d9c6;
+  --color-green-300:  #7db89a;
+  --color-green-400:  #5a9e7c;
+  --color-green-500:  #1a6b42;
+  --color-green-600:  #06402B;
+  --color-green-700:  #052e1f;
+  --color-green-800:  #041f15;
+  --color-green-900:  #030f0b;
+  --color-green-950:  #01080a;
+
+  /* amber → lighter/mid greens */
+  --color-amber-50:   #f2f8f5;
+  --color-amber-100:  #e0f0e8;
+  --color-amber-200:  #b6d9c6;
+  --color-amber-300:  #7db89a;
+  --color-amber-400:  #5a9e7c;
+  --color-amber-500:  #1a6b42;
+  --color-amber-600:  #06402B;
+  --color-amber-700:  #052e1f;
+  --color-amber-800:  #041f15;
+  --color-amber-900:  #030f0b;
+
+  /* blue → green shades */
+  --color-blue-50:    #f2f8f5;
+  --color-blue-100:   #e0f0e8;
+  --color-blue-200:   #b6d9c6;
+  --color-blue-300:   #7db89a;
+  --color-blue-400:   #5a9e7c;
+  --color-blue-500:   #1a6b42;
+  --color-blue-600:   #06402B;
+  --color-blue-700:   #052e1f;
+  --color-blue-800:   #041f15;
+  --color-blue-900:   #030f0b;
+
+  /* purple → deep green */
+  --color-purple-50:  #f2f8f5;
+  --color-purple-100: #e0f0e8;
+  --color-purple-200: #b6d9c6;
+  --color-purple-300: #7db89a;
+  --color-purple-400: #5a9e7c;
+  --color-purple-500: #1a6b42;
+  --color-purple-600: #06402B;
+  --color-purple-700: #052e1f;
+  --color-purple-800: #041f15;
+  --color-purple-900: #030f0b;
+
+  /* orange → green */
+  --color-orange-50:  #f2f8f5;
+  --color-orange-100: #e0f0e8;
+  --color-orange-200: #b6d9c6;
+  --color-orange-300: #7db89a;
+  --color-orange-400: #5a9e7c;
+  --color-orange-500: #1a6b42;
+  --color-orange-600: #06402B;
+  --color-orange-700: #052e1f;
+  --color-orange-800: #041f15;
+  --color-orange-900: #030f0b;
+
+  /* red → dark green (keeps destructive UI readable without red) */
+  --color-red-50:     #f2f8f5;
+  --color-red-100:    #e0f0e8;
+  --color-red-200:    #b6d9c6;
+  --color-red-300:    #7db89a;
+  --color-red-400:    #5a9e7c;
+  --color-red-500:    #1a6b42;
+  --color-red-600:    #06402B;
+  --color-red-700:    #052e1f;
+  --color-red-800:    #041f15;
+  --color-red-900:    #030f0b;
+
+  /* indigo / violet / sky / teal / cyan / lime / rose / fuchsia → green */
+  --color-indigo-50:  #f2f8f5; --color-indigo-100: #e0f0e8; --color-indigo-500: #1a6b42; --color-indigo-600: #06402B; --color-indigo-700: #052e1f;
+  --color-violet-50:  #f2f8f5; --color-violet-100: #e0f0e8; --color-violet-500: #1a6b42; --color-violet-600: #06402B; --color-violet-700: #052e1f;
+  --color-sky-50:     #f2f8f5; --color-sky-100:    #e0f0e8; --color-sky-500:    #1a6b42; --color-sky-600:    #06402B; --color-sky-700:    #052e1f;
+  --color-teal-50:    #f2f8f5; --color-teal-100:   #e0f0e8; --color-teal-500:   #1a6b42; --color-teal-600:   #06402B; --color-teal-700:   #052e1f;
+  --color-cyan-50:    #f2f8f5; --color-cyan-100:   #e0f0e8; --color-cyan-500:   #1a6b42; --color-cyan-600:   #06402B; --color-cyan-700:   #052e1f;
+  --color-lime-50:    #f2f8f5; --color-lime-100:   #e0f0e8; --color-lime-500:   #1a6b42; --color-lime-600:   #06402B; --color-lime-700:   #052e1f;
+  --color-rose-50:    #f2f8f5; --color-rose-100:   #e0f0e8; --color-rose-500:   #1a6b42; --color-rose-600:   #06402B; --color-rose-700:   #052e1f;
+  --color-pink-50:    #f2f8f5; --color-pink-100:   #e0f0e8; --color-pink-500:   #1a6b42; --color-pink-600:   #06402B; --color-pink-700:   #052e1f;
+  --color-fuchsia-50: #f2f8f5; --color-fuchsia-100: #e0f0e8; --color-fuchsia-500: #1a6b42; --color-fuchsia-600: #06402B; --color-fuchsia-700: #052e1f;
+  --color-yellow-50:  #f2f8f5; --color-yellow-100: #e0f0e8; --color-yellow-500: #1a6b42; --color-yellow-600: #06402B; --color-yellow-700: #052e1f;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #111827;
-    --foreground: #f3f4f6;
-    --primary: #22c55e;
-    --primary-dark: #16a34a;
-  }
+/* Class-based dark mode — controlled by next-themes */
+/* Force light variables when user picks "light" even on a dark OS */
+html:not(.dark) {
+  --background:       #f6faf7;
+  --surface:          #ffffff;
+  --foreground:       #0c1f15;
+  --foreground-muted: #4a6b58;
+  --border:           #cde0d6;
+  --brand-50:         #f2f8f5;
+  --brand-100:        #e0f0e8;
+  --brand-200:        #b6d9c6;
+  --brand-300:        #7db89a;
 }
+
+html.dark {
+  --background:       #07120d;
+  --surface:          #0d1f15;
+  --foreground:       #e5f2ea;
+  --foreground-muted: #7db89a;
+  --border:           #1a3d28;
+  --brand-50:         #0d1f15;
+  --brand-100:        #142e1f;
+  --brand-200:        #1e4831;
+  --brand-300:        #2e6b4a;
+}
+
+/* ================================================
+   Base
+   ================================================ */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
-/* Custom scrollbar */
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+/* ================================================
+   Scrollbar — brand-tinted
+   ================================================ */
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -44,49 +200,45 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
+  background: var(--brand-200);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--brand-muted);
 }
 
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-thumb {
-    background: #4b5563;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
-  }
-}
 
-/* Focus styles */
+/* ================================================
+   Focus
+   ================================================ */
+
 *:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
 
-/* Enhanced focus for buttons and links */
 button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--brand);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 0 4px rgba(6, 64, 43, 0.18);
 }
 
-/* Selection */
+/* ================================================
+   Selection
+   ================================================ */
+
 ::selection {
-  background: var(--primary);
+  background: var(--brand);
   color: white;
 }
 
-/* ========================================
+/* ================================================
    Accessibility Utilities
-   ======================================== */
+   ================================================ */
 
-/* Screen reader only - visually hidden but accessible */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -99,7 +251,6 @@ a:focus-visible,
   border: 0;
 }
 
-/* Skip to main content link */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -107,7 +258,7 @@ a:focus-visible,
   transform: translateX(-50%);
   z-index: 9999;
   padding: 0.75rem 1.5rem;
-  background: var(--primary);
+  background: var(--brand);
   color: white;
   font-weight: 600;
   border-radius: 0 0 0.5rem 0.5rem;
@@ -120,11 +271,12 @@ a:focus-visible,
   outline: none;
 }
 
-/* Reduced motion - respect user preferences */
+/* ================================================
+   Reduced motion
+   ================================================ */
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -132,45 +284,37 @@ a:focus-visible,
   }
 }
 
-/* High contrast mode support */
+/* ================================================
+   High contrast
+   ================================================ */
+
 @media (prefers-contrast: high) {
   :root {
-    --primary: #15803d;
-    --primary-dark: #14532d;
+    --primary:      #06402B;
+    --primary-dark: #052e1f;
   }
-
-  button,
-  a,
-  input,
-  select,
-  textarea {
+  button, a, input, select, textarea {
     border-width: 2px;
   }
-
   *:focus-visible {
     outline-width: 3px;
   }
 }
 
-/* Minimum touch target size for mobile (44x44px) */
+/* ================================================
+   Touch targets
+   ================================================ */
+
 .touch-target {
   min-width: 44px;
   min-height: 44px;
 }
 
-/* Ensure adequate spacing for touch targets */
 @media (pointer: coarse) {
-  button,
-  a,
-  input[type="checkbox"],
-  input[type="radio"],
-  select {
+  button, a, input[type="checkbox"], input[type="radio"], select {
     min-height: 44px;
   }
-
-  /* Add padding for inline links */
-  p a,
-  li a {
+  p a, li a {
     padding: 0.25rem 0;
     margin: -0.25rem 0;
   }

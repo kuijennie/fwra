@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, Button, Input, Select } from "@/components/ui";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ArrowsCounterClockwise, Fire, Grains, Drop, FileText, type Icon } from "@phosphor-icons/react";
 
 interface ReminderFormProps {
   sessionId: string;
@@ -13,12 +13,12 @@ interface ReminderFormProps {
   onCancel?: () => void;
 }
 
-const taskTypes = [
-  { value: "turn_compost", labelKey: "reminders.turnCompost", icon: "🔄" },
-  { value: "check_biogas", labelKey: "reminders.checkBiogas", icon: "🔥" },
-  { value: "harvest", labelKey: "reminders.harvest", icon: "🌾" },
-  { value: "water", labelKey: "reminders.waterPile", icon: "💧" },
-  { value: "custom", labelKey: "reminders.custom", icon: "📝" },
+const taskTypes: { value: string; labelKey: string; Icon: Icon }[] = [
+  { value: "turn_compost", labelKey: "reminders.turnCompost", Icon: ArrowsCounterClockwise },
+  { value: "check_biogas", labelKey: "reminders.checkBiogas", Icon: Fire },
+  { value: "harvest",      labelKey: "reminders.harvest",     Icon: Grains },
+  { value: "water",        labelKey: "reminders.waterPile",   Icon: Drop },
+  { value: "custom",       labelKey: "reminders.custom",      Icon: FileText },
 ];
 
 const repeatOptions = [
@@ -120,7 +120,7 @@ export function ReminderForm({ sessionId, onSuccess, onCancel }: ReminderFormPro
           </h3>
           {onCancel && (
             <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
-              <X className="h-4 w-4" />
+              <X weight="bold" className="h-4 w-4" />
             </Button>
           )}
         </div>
@@ -142,8 +142,8 @@ export function ReminderForm({ sessionId, onSuccess, onCancel }: ReminderFormPro
                     : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
               >
-                <span className="text-2xl mb-1">{type.icon}</span>
-                <span className="text-xs text-center text-gray-600 dark:text-gray-400 line-clamp-1">
+                <type.Icon weight="duotone" className="h-6 w-6 mb-1" style={{ color: "var(--brand)" }} />
+                <span className="text-xs text-center line-clamp-1" style={{ color: "var(--foreground-muted)" }}>
                   {t(type.labelKey).split(" ")[0]}
                 </span>
               </button>
@@ -238,7 +238,7 @@ export function ReminderForm({ sessionId, onSuccess, onCancel }: ReminderFormPro
 
         {/* Submit Button */}
         <Button type="submit" className="w-full" disabled={isSubmitting || !dueDate}>
-          <Plus className="h-4 w-4" />
+          <Plus weight="bold" className="h-4 w-4" />
           {isSubmitting ? t("common.loading") : t("reminders.addReminder")}
         </Button>
       </form>

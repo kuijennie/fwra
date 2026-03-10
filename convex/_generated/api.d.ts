@@ -13,12 +13,14 @@ import type * as init from "../init.js";
 import type * as legalDocuments from "../legalDocuments.js";
 import type * as recommendations from "../recommendations.js";
 import type * as reminders from "../reminders.js";
+import type * as reports from "../reports.js";
 import type * as seedData_buyers from "../seedData/buyers.js";
 import type * as seedData_legalDocuments from "../seedData/legalDocuments.js";
 import type * as seedData_successStories from "../seedData/successStories.js";
 import type * as seedData_tutorials from "../seedData/tutorials.js";
 import type * as successStories from "../successStories.js";
 import type * as tutorials from "../tutorials.js";
+import type * as users from "../users.js";
 import type * as wasteEntries from "../wasteEntries.js";
 
 import type {
@@ -33,12 +35,14 @@ declare const fullApi: ApiFromModules<{
   legalDocuments: typeof legalDocuments;
   recommendations: typeof recommendations;
   reminders: typeof reminders;
+  reports: typeof reports;
   "seedData/buyers": typeof seedData_buyers;
   "seedData/legalDocuments": typeof seedData_legalDocuments;
   "seedData/successStories": typeof seedData_successStories;
   "seedData/tutorials": typeof seedData_tutorials;
   successStories: typeof successStories;
   tutorials: typeof tutorials;
+  users: typeof users;
   wasteEntries: typeof wasteEntries;
 }>;
 

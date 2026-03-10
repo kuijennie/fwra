@@ -1,5 +1,15 @@
-import { query } from "./_generated/server";
+import { query, mutation, QueryCtx, MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
+import { Doc } from "./_generated/dataModel";
+
+async function getCallerWithRole(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+  return await ctx.db
+    .query("users")
+    .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+    .first();
+}
 
 // Get all active buyers
 export const getAll = query({
@@ -97,6 +107,124 @@ export const getById = query({
   args: { id: v.id("buyers") },
   handler: async (ctx, { id }) => {
     return await ctx.db.get(id);
+  },
+});
+
+// Buyer: create own listing
+export const createListing = mutation({
+  args: {
+    businessName: v.string(),
+    contactPerson: v.string(),
+    phone: v.string(),
+    email: v.optional(v.string()),
+    whatsapp: v.optional(v.string()),
+    county: v.string(),
+    subCounty: v.optional(v.string()),
+    address: v.optional(v.string()),
+    productTypes: v.array(v.string()),
+    description: v.object({ en: v.string(), sw: v.string() }),
+    priceRange: v.optional(v.object({ en: v.string(), sw: v.string() })),
+  },
+  handler: async (ctx, args) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || (caller.role !== "buyer" && caller.role !== "admin")) {
+      throw new Error("Unauthorized: buyer or admin role required");
+    }
+
+    const now = Date.now();
+    return await ctx.db.insert("buyers", {
+      userId: caller._id,
+      businessName: args.businessName,
+      contactPerson: args.contactPerson,
+      phone: args.phone,
+      email: args.email,
+      whatsapp: args.whatsapp,
+      county: args.county,
+      subCounty: args.subCounty,
+      address: args.address,
+      productTypes: args.productTypes,
+      description: args.description,
+      priceRange: args.priceRange,
+      logoUrl: undefined,
+      isVerified: false,
+      isActive: true,
+      rating: undefined,
+      reviewCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+  },
+});
+
+// Buyer: update own listing
+export const updateListing = mutation({
+  args: {
+    id: v.id("buyers"),
+    businessName: v.optional(v.string()),
+    contactPerson: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    whatsapp: v.optional(v.string()),
+    county: v.optional(v.string()),
+    subCounty: v.optional(v.string()),
+    address: v.optional(v.string()),
+    productTypes: v.optional(v.array(v.string())),
+    description: v.optional(v.object({ en: v.string(), sw: v.string() })),
+    priceRange: v.optional(v.object({ en: v.string(), sw: v.string() })),
+  },
+  handler: async (ctx, { id, ...updates }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller) throw new Error("Not authenticated");
+
+    const listing = await ctx.db.get(id);
+    if (!listing) throw new Error("Listing not found");
+
+    // Only the listing owner or an admin can update
+    if (caller.role !== "admin" && listing.userId !== caller._id) {
+      throw new Error("Unauthorized: can only update your own listing");
+    }
+
+    const patch: Record<string, unknown> = { updatedAt: Date.now() };
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        patch[key] = value;
+      }
+    }
+
+    await ctx.db.patch(id, patch);
+    return { success: true };
+  },
+});
+
+// Admin: list all buyers (including inactive)
+export const adminListAll = query({
+  args: {},
+  handler: async (ctx) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") return null;
+    return await ctx.db.query("buyers").order("desc").collect();
+  },
+});
+
+// Admin: set verification status
+export const adminSetVerified = mutation({
+  args: { id: v.id("buyers"), isVerified: v.boolean() },
+  handler: async (ctx, { id, isVerified }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    await ctx.db.patch(id, { isVerified, updatedAt: Date.now() });
+    return { success: true };
+  },
+});
+
+// Admin: toggle active status
+export const adminSetActive = mutation({
+  args: { id: v.id("buyers"), isActive: v.boolean() },
+  handler: async (ctx, { id, isActive }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    await ctx.db.patch(id, { isActive, updatedAt: Date.now() });
+    return { success: true };
   },
 });
 

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { RecommendationCard } from "./recommendation-card";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb } from "@phosphor-icons/react";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface Recommendation {
@@ -57,7 +57,7 @@ export function RecommendationList({
     return (
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center">
         <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-          <Lightbulb className="h-6 w-6 text-gray-400" />
+          <Lightbulb weight="duotone" className="h-6 w-6 text-gray-400" />
         </div>
         <h3 className="font-medium text-gray-900 dark:text-white mb-2">
           {t("recommendations.noRecommendations")}

@@ -10,7 +10,7 @@ import { LocationPicker } from "./location-picker";
 import { ResourceChecklist } from "./resource-checklist";
 import { SeasonSelector } from "./season-selector";
 import { type WasteCategory, volumeUnits } from "@/lib/constants";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, CircleNotch as Loader2 } from "@phosphor-icons/react";
 
 export interface WasteInputData {
   wasteType: WasteCategory;
@@ -175,13 +175,13 @@ export function WasteInputForm({ onSubmit }: WasteInputFormProps) {
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 weight="duotone" className="h-5 w-5 animate-spin" />
             {t("common.loading")}
           </>
         ) : (
           <>
             {t("wasteInput.getRecommendations")}
-            <ArrowRight className="h-5 w-5" />
+            <ArrowRight weight="duotone" className="h-5 w-5" />
           </>
         )}
       </Button>

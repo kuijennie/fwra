@@ -1,7 +1,11 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+import {
+  Grains, Barn, ForkKnife, ArrowsCounterClockwise,
+  Plant, Leaf, Drop, Coffee, Flower,
+  type Icon,
+} from "@phosphor-icons/react";
 import {
   wasteCategories,
   getWasteSubTypesByCategory,
@@ -14,6 +18,32 @@ interface WasteTypeSelectorProps {
   onCategoryChange: (category: WasteCategory) => void;
   onSubTypeChange: (subType: string) => void;
 }
+
+const categoryIconMap: Record<string, Icon> = {
+  crop_residue: Grains,
+  manure:       Barn,
+  food_scraps:  ForkKnife,
+  other:        ArrowsCounterClockwise,
+};
+
+const subTypeIconMap: Record<string, Icon> = {
+  maize_stalks:        Grains,
+  wheat_straw:         Grains,
+  rice_husks:          Grains,
+  sugarcane_bagasse:   Plant,
+  bean_residue:        Flower,
+  vegetable_trimmings: Leaf,
+  fruit_peels:         Drop,
+  coffee_pulp:         Coffee,
+  tea_waste:           Coffee,
+  cow_dung:            Barn,
+  goat_droppings:      Barn,
+  chicken_manure:      Barn,
+  pig_manure:          Barn,
+  vegetable_peels:     Leaf,
+  food_leftovers:      ForkKnife,
+  spoiled_produce:     Plant,
+};
 
 export function WasteTypeSelector({
   selectedCategory,
@@ -31,59 +61,77 @@ export function WasteTypeSelector({
     <div className="space-y-6">
       {/* Category Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+        <label className="block text-sm font-medium mb-3" style={{ color: "var(--foreground-muted)" }}>
           {t("wasteInput.wasteType")}
         </label>
         <div className="grid grid-cols-2 gap-3">
-          {wasteCategories.map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              onClick={() => onCategoryChange(category.id)}
-              className={cn(
-                "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
-                selectedCategory === category.id
-                  ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                  : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-              )}
-            >
-              <span className="text-3xl">{category.icon}</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white text-center">
-                {t(category.labelKey)}
-              </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 text-center line-clamp-2">
-                {t(category.descKey)}
-              </span>
-            </button>
-          ))}
+          {wasteCategories.map((category) => {
+            const CatIcon = categoryIconMap[category.id] ?? Grains;
+            const isSelected = selectedCategory === category.id;
+            return (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => onCategoryChange(category.id)}
+                className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all"
+                style={{
+                  borderColor: isSelected ? "var(--brand)" : "var(--border)",
+                  background: isSelected ? "var(--brand-50)" : "var(--surface)",
+                }}
+              >
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-xl"
+                  style={{
+                    background: isSelected ? "var(--brand-100)" : "var(--brand-50)",
+                    color: "var(--brand)",
+                  }}
+                >
+                  <CatIcon weight="duotone" className="h-6 w-6" />
+                </div>
+                <span className="text-sm font-medium text-center" style={{ color: "var(--foreground)" }}>
+                  {t(category.labelKey)}
+                </span>
+                <span className="text-xs text-center line-clamp-2" style={{ color: "var(--foreground-muted)" }}>
+                  {t(category.descKey)}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Sub-type Selection */}
       {selectedCategory && subTypes.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <label className="block text-sm font-medium mb-3" style={{ color: "var(--foreground-muted)" }}>
             {t("wasteInput.wasteSubType")}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {subTypes.map((subType) => (
-              <button
-                key={subType.id}
-                type="button"
-                onClick={() => onSubTypeChange(subType.id)}
-                className={cn(
-                  "flex items-center gap-2 p-3 rounded-lg border transition-all text-left",
-                  selectedSubType === subType.id
-                    ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                )}
-              >
-                <span className="text-xl">{subType.icon}</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {t(subType.labelKey)}
-                </span>
-              </button>
-            ))}
+            {subTypes.map((subType) => {
+              const SubIcon = subTypeIconMap[subType.id] ?? Grains;
+              const isSelected = selectedSubType === subType.id;
+              return (
+                <button
+                  key={subType.id}
+                  type="button"
+                  onClick={() => onSubTypeChange(subType.id)}
+                  className="flex items-center gap-2 p-3 rounded-lg border transition-all text-left"
+                  style={{
+                    borderColor: isSelected ? "var(--brand)" : "var(--border)",
+                    background: isSelected ? "var(--brand-50)" : "var(--surface)",
+                  }}
+                >
+                  <SubIcon
+                    weight="duotone"
+                    className="h-5 w-5 shrink-0"
+                    style={{ color: "var(--brand)" }}
+                  />
+                  <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                    {t(subType.labelKey)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

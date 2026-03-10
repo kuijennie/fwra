@@ -279,6 +279,32 @@ export const getRecent = query({
   },
 });
 
+// Get recommendations for the most recent waste entry
+export const getLatest = query({
+  args: {
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get the most recent waste entry
+    const latestEntry = await ctx.db
+      .query("wasteEntries")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .order("desc")
+      .first();
+
+    if (!latestEntry) return [];
+
+    // Get recommendations for that specific entry
+    const recommendations = await ctx.db
+      .query("recommendations")
+      .withIndex("by_waste_entry", (q) => q.eq("wasteEntryId", latestEntry._id))
+      .order("desc")
+      .collect();
+
+    return recommendations;
+  },
+});
+
 // Select a recommendation
 export const select = mutation({
   args: {

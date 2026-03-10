@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { TutorialGrid } from "@/components/tutorials";
 import { Link } from "@/lib/i18n/navigation";
-import { ChevronLeft } from "lucide-react";
+import { CaretLeft as ChevronLeft } from "@phosphor-icons/react";
 
 interface CategoryPageClientProps {
   category: string;
@@ -34,7 +34,7 @@ export function CategoryPageClient({ category }: CategoryPageClientProps) {
           href="/tutorials"
           className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft weight="duotone" className="h-4 w-4" />
           {t("common.back")}
         </Link>
 

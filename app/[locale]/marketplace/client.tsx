@@ -6,7 +6,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BuyerGrid, SearchFilters } from "@/components/marketplace";
 import { Badge } from "@/components/ui";
-import { Store, CheckCircle, Users } from "lucide-react";
+import { Storefront as Store, CheckCircle, Users } from "@phosphor-icons/react";
 
 export function MarketplaceClient() {
   const t = useTranslations();
@@ -32,7 +32,7 @@ export function MarketplaceClient() {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <Store className="h-7 w-7 text-green-600" />
+            <Store weight="duotone" className="h-7 w-7 text-green-600" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {t("marketplace.title")}
             </h1>
@@ -46,7 +46,7 @@ export function MarketplaceClient() {
         {stats && (
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-              <Users className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+              <Users weight="duotone" className="h-5 w-5 text-blue-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.total}
               </div>
@@ -55,7 +55,7 @@ export function MarketplaceClient() {
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-              <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
+              <CheckCircle weight="duotone" className="h-5 w-5 text-green-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.verified}
               </div>
@@ -64,7 +64,7 @@ export function MarketplaceClient() {
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-              <Store className="h-5 w-5 text-purple-600 mx-auto mb-1" />
+              <Store weight="duotone" className="h-5 w-5 text-purple-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {Object.keys(stats.byCounty).length}
               </div>

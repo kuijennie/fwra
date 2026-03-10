@@ -1,5 +1,15 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
+import { Doc } from "./_generated/dataModel";
+
+async function getCallerWithRole(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+  return await ctx.db
+    .query("users")
+    .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+    .first();
+}
 
 // Get all published tutorials
 export const getAll = query({
@@ -101,6 +111,27 @@ export const getByIds = query({
       args.ids.map((id) => ctx.db.get(id))
     );
     return tutorials.filter((t) => t !== null && t.isPublished);
+  },
+});
+
+// Admin: list all tutorials (including unpublished)
+export const adminListAll = query({
+  args: {},
+  handler: async (ctx) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") return null;
+    return await ctx.db.query("tutorials").order("desc").collect();
+  },
+});
+
+// Admin: set published status
+export const adminSetPublished = mutation({
+  args: { id: v.id("tutorials"), isPublished: v.boolean() },
+  handler: async (ctx, { id, isPublished }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    await ctx.db.patch(id, { isPublished, updatedAt: Date.now() });
+    return { success: true };
   },
 });
 

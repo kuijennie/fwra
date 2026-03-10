@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { seasons } from "@/lib/constants";
-import { Sun, CloudRain, CloudSun } from "lucide-react";
+import { Sun, CloudRain, CloudSun } from "@phosphor-icons/react";
 
 interface SeasonSelectorProps {
   selectedSeason: string;
@@ -46,6 +46,7 @@ export function SeasonSelector({
               )}
             >
               <Icon
+                weight="duotone"
                 className={cn(
                   "h-6 w-6",
                   isSelected

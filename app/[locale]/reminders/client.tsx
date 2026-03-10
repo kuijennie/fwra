@@ -7,7 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { useSession } from "@/lib/hooks/use-session";
 import { ReminderList, ReminderForm } from "@/components/reminders";
 import { Button, Card } from "@/components/ui";
-import { Bell, Plus, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Bell, Plus, Clock, CheckCircle, WarningCircle as AlertCircle, CircleNotch as Loader2 } from "@phosphor-icons/react";
 
 export function RemindersClient() {
   const t = useTranslations();
@@ -55,7 +55,7 @@ export function RemindersClient() {
     return (
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
         <div className="mx-auto max-w-2xl flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+          <Loader2 weight="duotone" className="h-8 w-8 animate-spin text-green-600" />
         </div>
       </main>
     );
@@ -68,7 +68,7 @@ export function RemindersClient() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Bell className="h-6 w-6 text-green-600" />
+              <Bell weight="duotone" className="h-6 w-6 text-green-600" />
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {t("reminders.title")}
               </h1>
@@ -79,7 +79,7 @@ export function RemindersClient() {
           </div>
           {!showForm && (
             <Button onClick={() => setShowForm(true)}>
-              <Plus className="h-4 w-4" />
+              <Plus weight="bold" className="h-4 w-4" />
               {t("reminders.addReminder")}
             </Button>
           )}
@@ -89,7 +89,7 @@ export function RemindersClient() {
         {stats && (
           <div className="grid grid-cols-3 gap-3 mb-6">
             <Card className="p-4 text-center">
-              <Clock className="h-5 w-5 text-blue-600 mx-auto mb-1" />
+              <Clock weight="duotone" className="h-5 w-5 text-blue-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.pending}
               </div>
@@ -98,7 +98,7 @@ export function RemindersClient() {
               </div>
             </Card>
             <Card className="p-4 text-center">
-              <AlertCircle className="h-5 w-5 text-red-600 mx-auto mb-1" />
+              <AlertCircle weight="duotone" className="h-5 w-5 text-red-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.overdue}
               </div>
@@ -107,7 +107,7 @@ export function RemindersClient() {
               </div>
             </Card>
             <Card className="p-4 text-center">
-              <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
+              <CheckCircle weight="duotone" className="h-5 w-5 text-green-600 mx-auto mb-1" />
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stats.completed}
               </div>

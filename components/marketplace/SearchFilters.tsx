@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { Select } from "@/components/ui";
 import { KENYA_COUNTIES } from "@/lib/constants/counties";
-import { Search, Filter } from "lucide-react";
+import { MagnifyingGlass as Search, Funnel as Filter } from "@phosphor-icons/react";
 
 interface SearchFiltersProps {
   searchQuery: string;
@@ -53,7 +53,7 @@ export function SearchFilters({
     <div className="space-y-4 mb-6">
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <Search weight="duotone" className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         <input
           type="text"
           value={searchQuery}
@@ -66,7 +66,7 @@ export function SearchFilters({
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <Filter className="h-4 w-4" />
+          <Filter weight="duotone" className="h-4 w-4" />
           <span>{t("marketplace.filters")}:</span>
         </div>
 

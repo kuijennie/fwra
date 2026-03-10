@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, Badge, Button } from "@/components/ui";
-import { Check, Clock, Trash2, RefreshCw, AlertCircle } from "lucide-react";
+import { Check, Clock, Trash as Trash2, ArrowClockwise as RefreshCw, WarningCircle as AlertCircle, ArrowsCounterClockwise, Fire, Grains, Drop, FileText, type Icon } from "@phosphor-icons/react";
 import { formatDistanceToNow, format, isPast, isToday } from "date-fns";
 import type { Doc } from "@/convex/_generated/dataModel";
 
@@ -12,12 +12,12 @@ interface ReminderCardProps {
   reminder: Doc<"reminders">;
 }
 
-const taskTypeIcons: Record<string, string> = {
-  turn_compost: "🔄",
-  check_biogas: "🔥",
-  harvest: "🌾",
-  water: "💧",
-  custom: "📝",
+const taskTypeIcons: Record<string, Icon> = {
+  turn_compost: ArrowsCounterClockwise,
+  check_biogas: Fire,
+  harvest:      Grains,
+  water:        Drop,
+  custom:       FileText,
 };
 
 export function ReminderCard({ reminder }: ReminderCardProps) {
@@ -77,8 +77,11 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
     <Card className={`p-4 ${isOverdue ? "border-red-300 dark:border-red-800" : ""}`}>
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div className="text-2xl">
-          {taskTypeIcons[reminder.taskType] || "📝"}
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+          style={{ background: "var(--brand-100)", color: "var(--brand)" }}
+        >
+          {(() => { const TaskIcon = taskTypeIcons[reminder.taskType] ?? FileText; return <TaskIcon weight="duotone" className="h-5 w-5" />; })()}
         </div>
 
         {/* Content */}
@@ -98,7 +101,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
 
           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
+              <Clock weight="duotone" className="h-4 w-4" />
               {isOverdue ? (
                 <span className="text-red-600 dark:text-red-400">
                   {formatDistanceToNow(dueDate, { addSuffix: true })}
@@ -110,7 +113,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
 
             {getRepeatLabel() && (
               <span className="flex items-center gap-1">
-                <RefreshCw className="h-3 w-3" />
+                <RefreshCw weight="duotone" className="h-3 w-3" />
                 {getRepeatLabel()}
               </span>
             )}
@@ -126,7 +129,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
               onClick={handleComplete}
               className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
             >
-              <Check className="h-4 w-4" />
+              <Check weight="bold" className="h-4 w-4" />
             </Button>
           )}
           <Button
@@ -135,7 +138,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
             onClick={handleDelete}
             className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 weight="duotone" className="h-4 w-4" />
           </Button>
         </div>
       </div>

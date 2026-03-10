@@ -5,7 +5,7 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { WasteInputForm, type WasteInputData } from "@/components/forms";
 import { useSession } from "@/lib/hooks";
-import { Loader2 } from "lucide-react";
+import { CircleNotch as Loader2 } from "@phosphor-icons/react";
 
 export function WasteInputPageClient() {
   const t = useTranslations();
@@ -43,7 +43,7 @@ export function WasteInputPageClient() {
     return (
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">
         <div className="mx-auto max-w-2xl flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+          <Loader2 weight="duotone" className="h-8 w-8 animate-spin text-green-600" />
         </div>
       </main>
     );

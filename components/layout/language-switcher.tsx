@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/lib/i18n/navigation";
 import { locales, localeNames, type Locale } from "@/lib/i18n/config";
-import { Globe, ChevronDown } from "lucide-react";
+import { Globe, CaretDown as ChevronDown } from "@phosphor-icons/react";
 import { useState, useRef, useEffect } from "react";
 
 export function LanguageSwitcher() {
@@ -36,29 +36,40 @@ export function LanguageSwitcher() {
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
+        className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
         aria-label="Change language"
         aria-expanded={isOpen}
       >
-        <Globe className="h-4 w-4" />
+        <Globe weight="duotone" className="h-4 w-4" />
         <span className="hidden sm:inline">{localeNames[locale]}</span>
         <span className="sm:hidden">{locale.toUpperCase()}</span>
         <ChevronDown
+          weight="duotone"
           className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+        <div
+          className="absolute right-0 mt-2 w-40 rounded-lg py-1 shadow-lg"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+        >
           {locales.map((loc) => (
             <button
               key={loc}
               onClick={() => handleLocaleChange(loc)}
-              className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+              className="w-full px-4 py-2 text-left text-sm transition-colors"
+              style={
                 loc === locale
-                  ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
+                  ? { background: "var(--brand-100)", color: "var(--brand)" }
+                  : { color: "var(--foreground-muted)" }
+              }
+              onMouseEnter={(e) => {
+                if (loc !== locale) (e.currentTarget as HTMLButtonElement).style.background = "var(--brand-50)";
+              }}
+              onMouseLeave={(e) => {
+                if (loc !== locale) (e.currentTarget as HTMLButtonElement).style.background = "";
+              }}
             >
               {localeNames[loc]}
             </button>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
-import { ChevronLeft, ChevronRight, Lightbulb, Check } from "lucide-react";
+import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, Lightbulb, Check } from "@phosphor-icons/react";
 
 interface Step {
   stepNumber: number;
@@ -115,7 +115,7 @@ export function StepViewer({ steps, onComplete }: StepViewerProps) {
               )}
             >
               {completedSteps.includes(currentStep) ? (
-                <Check className="h-5 w-5" />
+                <Check weight="bold" className="h-5 w-5" />
               ) : (
                 step.stepNumber
               )}
@@ -136,7 +136,7 @@ export function StepViewer({ steps, onComplete }: StepViewerProps) {
           {localizedTip && (
             <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
               <div className="flex gap-3">
-                <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                <Lightbulb weight="duotone" className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="font-medium text-amber-800 dark:text-amber-300">
                     {t("tutorials.tip")}:
@@ -159,7 +159,7 @@ export function StepViewer({ steps, onComplete }: StepViewerProps) {
           disabled={isFirstStep}
           className="flex-1"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft weight="duotone" className="h-4 w-4" />
           {t("common.previous")}
         </Button>
 
@@ -167,12 +167,12 @@ export function StepViewer({ steps, onComplete }: StepViewerProps) {
           {isLastStep ? (
             <>
               {t("tutorials.completeTutorial")}
-              <Check className="h-4 w-4" />
+              <Check weight="bold" className="h-4 w-4" />
             </>
           ) : (
             <>
               {t("common.next")}
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight weight="duotone" className="h-4 w-4" />
             </>
           )}
         </Button>

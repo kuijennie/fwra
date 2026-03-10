@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils";
 import { Badge, Button } from "@/components/ui";
 import {
   Leaf,
-  Flame,
-  Droplets,
-  Recycle,
+  Fire as Flame,
+  Drop as Droplets,
+  ArrowsCounterClockwise as Recycle,
   Bug,
   Clock,
   CheckCircle,
-  ChevronRight,
-} from "lucide-react";
+  CaretRight as ChevronRight,
+} from "@phosphor-icons/react";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface Recommendation {
@@ -88,14 +88,14 @@ export function RecommendationCard({
       {/* Selected Badge */}
       {recommendation.isSelected && (
         <div className="absolute -top-2 -right-2 rounded-full bg-green-500 p-1">
-          <CheckCircle className="h-4 w-4 text-white" />
+          <CheckCircle weight="duotone" className="h-4 w-4 text-white" />
         </div>
       )}
 
       <div className="flex gap-4">
         {/* Icon */}
         <div className={cn("rounded-xl p-3 h-fit", colorClasses[color])}>
-          <Icon className="h-6 w-6" />
+          <Icon weight="duotone" className="h-6 w-6" />
         </div>
 
         {/* Content */}
@@ -127,7 +127,7 @@ export function RecommendationCard({
               {t(`recommendations.${recommendation.difficulty}`)}
             </Badge>
             <Badge variant="default" size="sm">
-              <Clock className="h-3 w-3 mr-1" />
+              <Clock weight="duotone" className="h-3 w-3 mr-1" />
               {recommendation.estimatedDuration}
             </Badge>
           </div>
@@ -149,7 +149,7 @@ export function RecommendationCard({
                 onClick={() => onViewDetails(recommendation._id)}
               >
                 {t("common.learnMore")}
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight weight="duotone" className="h-4 w-4" />
               </Button>
             )}
           </div>
