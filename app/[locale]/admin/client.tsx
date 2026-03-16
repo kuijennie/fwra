@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useQuery, useMutation } from "convex/react";
+import { useUser } from "@clerk/nextjs";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
   Users,
@@ -15,51 +16,107 @@ import {
   Bell,
   CircleNotch as Loader2,
   ShieldWarning as ShieldAlert,
-  CheckCircle,
-  XCircle,
-  ChartBar as BarChart3,
+  MagnifyingGlass as Search,
   BookOpen,
   Star,
-  MagnifyingGlass as Search,
-  ToggleLeft,
-  ToggleRight,
-  SealCheck as BadgeCheck,
+  PaperPlaneTilt,
+  Plus,
+  Trash,
+  CheckCircle,
+  X,
+  PencilSimple,
 } from "@phosphor-icons/react";
 import { Id } from "@/convex/_generated/dataModel";
 
-type Tab = "overview" | "users" | "buyers" | "content";
+type Tab = "overview" | "users" | "content";
+type ContentSubTab = "tutorials" | "stories";
 
-/* ── design tokens ───────────────────────── */
-const B   = "#06402B";          // brand
+const B = "#06402B";
 const B10 = "rgba(6,64,43,0.10)";
 const B06 = "rgba(6,64,43,0.06)";
-const BG  = "var(--background)";
+const BG = "var(--background)";
 const SUR = "var(--surface)";
 const BRD = "var(--border)";
-const FG  = "var(--foreground)";
+const FG = "var(--foreground)";
 const FGM = "var(--foreground-muted)";
+
+type StepDraft = { titleEn: string; titleSw: string; contentEn: string; contentSw: string };
+
+const emptyTutorialForm = () => ({
+  titleEn: "",
+  titleSw: "",
+  descEn: "",
+  descSw: "",
+  category: "composting",
+  difficulty: "beginner",
+  duration: "",
+  steps: [{ titleEn: "", titleSw: "", contentEn: "", contentSw: "" }] as StepDraft[],
+});
+
+const emptyStoryForm = () => ({
+  farmerName: "",
+  county: "nairobi",
+  method: "composting",
+  storyEn: "",
+  storySw: "",
+  resultsEn: "",
+  resultsSw: "",
+});
 
 export function AdminDashboardClient() {
   const t = useTranslations();
+  const { user: clerkUser } = useUser();
+  const adminEmail = clerkUser?.primaryEmailAddress?.emailAddress;
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [userSearch, setUserSearch] = useState("");
+  const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("tutorials");
+
+  // Tutorial form state
+  const [showCreateTutorial, setShowCreateTutorial] = useState(false);
+  const [editingTutorialId, setEditingTutorialId] = useState<Id<"tutorials"> | null>(null);
+  const [tutorialForm, setTutorialForm] = useState(emptyTutorialForm());
+  const [savingTutorial, setSavingTutorial] = useState(false);
+
+  // Story form state
+  const [showCreateStory, setShowCreateStory] = useState(false);
+  const [editingStoryId, setEditingStoryId] = useState<Id<"successStories"> | null>(null);
+  const [storyForm, setStoryForm] = useState(emptyStoryForm());
+  const [savingStory, setSavingStory] = useState(false);
+
+  // Email state: maps item ID → { sending, result }
+  const [emailState, setEmailState] = useState<Record<string, { sending: boolean; sent?: number; error?: string }>>({});
 
   const currentUser = useQuery(api.users.getCurrent);
-  const stats       = useQuery(api.users.getStats);
-  const users       = useQuery(api.users.listAll);
-  const buyers      = useQuery(api.buyers.adminListAll);
-  const stories     = useQuery(api.successStories.adminListAll);
-  const tutorials   = useQuery(api.tutorials.adminListAll);
+  const fallbackUser = useQuery(api.users.getByEmail, adminEmail ? { email: adminEmail } : "skip");
+  const effectiveUser = currentUser ?? fallbackUser;
+  const useFallback = !currentUser && !!adminEmail;
 
-  const updateRole         = useMutation(api.users.updateRole);
-  const setVerified        = useMutation(api.buyers.adminSetVerified);
-  const setActive          = useMutation(api.buyers.adminSetActive);
-  const setStoryApproved   = useMutation(api.successStories.adminSetApproved);
-  const deleteStory        = useMutation(api.successStories.adminDelete);
-  const setTutorialPublished = useMutation(api.tutorials.adminSetPublished);
+  const stats = useQuery(
+    useFallback ? api.users.getStatsByEmail : api.users.getStats,
+    useFallback ? { adminEmail: adminEmail! } : {}
+  );
+  const users = useQuery(
+    useFallback ? api.users.listAllByEmail : api.users.listAll,
+    useFallback ? { adminEmail: adminEmail! } : {}
+  );
 
-  /* ── loading ── */
-  if (currentUser === undefined) {
+  const tutorials = useQuery(api.tutorials.adminListAll);
+  const stories = useQuery(api.successStories.adminListAll);
+
+  const updateRole = useMutation(api.users.updateRole);
+  const updateRoleByEmail = useMutation(api.users.updateRoleByEmail);
+  const createTutorial = useMutation(api.tutorials.adminCreate);
+  const updateTutorial = useMutation(api.tutorials.adminUpdate);
+  const deleteTutorial = useMutation(api.tutorials.adminDelete);
+  const setPublished = useMutation(api.tutorials.adminSetPublished);
+  const createStory = useMutation(api.successStories.adminCreate);
+  const updateStory = useMutation(api.successStories.adminUpdate);
+  const setApproved = useMutation(api.successStories.adminSetApproved);
+  const deleteStory = useMutation(api.successStories.adminDelete);
+  const sendTutorialEmail = useAction(api.email.sendTutorialEmail);
+  const sendStoryEmail = useAction(api.email.sendStoryEmail);
+
+  if (currentUser === undefined || (adminEmail && fallbackUser === undefined)) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4 py-8" style={{ background: BG }}>
         <Loader2 weight="duotone" className="h-7 w-7 animate-spin" style={{ color: B }} />
@@ -67,15 +124,11 @@ export function AdminDashboardClient() {
     );
   }
 
-  /* ── access denied ── */
-  if (!currentUser || currentUser.role !== "admin") {
+  if (!effectiveUser || effectiveUser.role !== "admin") {
     return (
       <main className="min-h-screen px-4 py-8" style={{ background: BG }}>
         <div className="mx-auto max-w-6xl">
-          <div
-            className="flex flex-col items-center justify-center rounded-2xl border p-12 text-center"
-            style={{ background: SUR, borderColor: BRD }}
-          >
+          <div className="flex flex-col items-center justify-center rounded-2xl border p-12 text-center" style={{ background: SUR, borderColor: BRD }}>
             <div className="mb-4 rounded-full p-4" style={{ background: B10 }}>
               <ShieldAlert weight="duotone" className="h-10 w-10" style={{ color: B }} />
             </div>
@@ -98,18 +151,159 @@ export function AdminDashboardClient() {
     );
   });
 
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "overview", label: t("admin.tabOverview"), icon: <BarChart3 weight="duotone" className="h-4 w-4" /> },
-    { id: "users",    label: t("admin.tabUsers"),    icon: <Users     weight="duotone" className="h-4 w-4" /> },
-    { id: "buyers",   label: t("admin.tabBuyers"),   icon: <ShoppingBag weight="duotone" className="h-4 w-4" /> },
-    { id: "content",  label: t("admin.tabContent"),  icon: <BookOpen  weight="duotone" className="h-4 w-4" /> },
-  ];
+  const handleRoleChange = (userId: Id<"users">, role: string) => {
+    if (useFallback) {
+      return updateRoleByEmail({ adminEmail: adminEmail!, userId, role });
+    }
+    return updateRole({ userId, role });
+  };
+
+  // ── Tutorial handlers ─────────────────────────────────────────────────────
+  const addStep = () =>
+    setTutorialForm((f) => ({
+      ...f,
+      steps: [...f.steps, { titleEn: "", titleSw: "", contentEn: "", contentSw: "" }],
+    }));
+
+  const removeStep = (i: number) =>
+    setTutorialForm((f) => ({ ...f, steps: f.steps.filter((_, idx) => idx !== i) }));
+
+  const updateStep = (i: number, field: keyof StepDraft, value: string) =>
+    setTutorialForm((f) => {
+      const steps = [...f.steps];
+      steps[i] = { ...steps[i], [field]: value };
+      return { ...f, steps };
+    });
+
+  const closeTutorialForm = () => {
+    setShowCreateTutorial(false);
+    setEditingTutorialId(null);
+    setTutorialForm(emptyTutorialForm());
+  };
+
+  const handleSaveTutorial = async () => {
+    if (!tutorialForm.titleEn || !tutorialForm.titleSw || !tutorialForm.duration) return;
+    setSavingTutorial(true);
+    try {
+      const payload = {
+        category: tutorialForm.category,
+        title: { en: tutorialForm.titleEn, sw: tutorialForm.titleSw },
+        description: { en: tutorialForm.descEn, sw: tutorialForm.descSw },
+        difficulty: tutorialForm.difficulty,
+        duration: tutorialForm.duration,
+        steps: tutorialForm.steps.map((s, i) => ({
+          stepNumber: i + 1,
+          title: { en: s.titleEn, sw: s.titleSw },
+          content: { en: s.contentEn, sw: s.contentSw },
+        })),
+      };
+      if (editingTutorialId) {
+        await updateTutorial({ id: editingTutorialId, ...payload });
+      } else {
+        const slug = tutorialForm.titleEn
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
+        await createTutorial({ slug, ...payload });
+      }
+      closeTutorialForm();
+    } finally {
+      setSavingTutorial(false);
+    }
+  };
+
+  const handleEditTutorial = (tut: NonNullable<typeof tutorials>[number]) => {
+    setTutorialForm({
+      titleEn: tut.title.en,
+      titleSw: tut.title.sw,
+      descEn: tut.description.en,
+      descSw: tut.description.sw,
+      category: tut.category,
+      difficulty: tut.difficulty,
+      duration: tut.duration,
+      steps: tut.steps.map((s) => ({
+        titleEn: s.title.en,
+        titleSw: s.title.sw,
+        contentEn: s.content.en,
+        contentSw: s.content.sw,
+      })),
+    });
+    setEditingTutorialId(tut._id);
+    setShowCreateTutorial(true);
+  };
+
+  const handleDeleteTutorial = async (id: Id<"tutorials">) => {
+    if (!confirm("Delete this tutorial?")) return;
+    await deleteTutorial({ id });
+  };
+
+  // ── Story handlers ────────────────────────────────────────────────────────
+  const closeStoryForm = () => {
+    setShowCreateStory(false);
+    setEditingStoryId(null);
+    setStoryForm(emptyStoryForm());
+  };
+
+  const handleSaveStory = async () => {
+    if (!storyForm.farmerName || !storyForm.storyEn || !storyForm.storySw) return;
+    setSavingStory(true);
+    try {
+      const payload = {
+        farmerName: storyForm.farmerName,
+        county: storyForm.county,
+        method: storyForm.method,
+        story: { en: storyForm.storyEn, sw: storyForm.storySw },
+        results: { en: storyForm.resultsEn, sw: storyForm.resultsSw },
+      };
+      if (editingStoryId) {
+        await updateStory({ id: editingStoryId, ...payload });
+      } else {
+        await createStory(payload);
+      }
+      closeStoryForm();
+    } finally {
+      setSavingStory(false);
+    }
+  };
+
+  const handleEditStory = (story: NonNullable<typeof stories>[number]) => {
+    setStoryForm({
+      farmerName: story.farmerName,
+      county: story.county,
+      method: story.method,
+      storyEn: story.story.en,
+      storySw: story.story.sw,
+      resultsEn: story.results.en,
+      resultsSw: story.results.sw,
+    });
+    setEditingStoryId(story._id);
+    setShowCreateStory(true);
+  };
+
+  // ── Email handlers ────────────────────────────────────────────────────────
+  const handleSendTutorialEmail = async (id: Id<"tutorials">) => {
+    setEmailState((s) => ({ ...s, [id]: { sending: true } }));
+    try {
+      const result = await sendTutorialEmail({ tutorialId: id });
+      setEmailState((s) => ({ ...s, [id]: { sending: false, sent: result.sent } }));
+    } catch (e) {
+      setEmailState((s) => ({ ...s, [id]: { sending: false, error: (e as Error).message } }));
+    }
+  };
+
+  const handleSendStoryEmail = async (id: Id<"successStories">) => {
+    setEmailState((s) => ({ ...s, [id]: { sending: true } }));
+    try {
+      const result = await sendStoryEmail({ storyId: id });
+      setEmailState((s) => ({ ...s, [id]: { sending: false, sent: result.sent } }));
+    } catch (e) {
+      setEmailState((s) => ({ ...s, [id]: { sending: false, error: (e as Error).message } }));
+    }
+  };
 
   return (
     <main className="min-h-screen px-4 py-8" style={{ background: BG }}>
       <div className="mx-auto max-w-6xl">
-
-        {/* Page header */}
         <div className="mb-6">
           <h1 className="font-display mb-1 text-2xl font-bold italic" style={{ color: FG }}>
             {t("admin.title")}
@@ -117,68 +311,57 @@ export function AdminDashboardClient() {
           <p className="text-sm" style={{ color: FGM }}>
             {t("admin.subtitle")}
           </p>
+          {useFallback && (
+            <p className="mt-2 text-xs" style={{ color: FGM }}>
+              Admin access is using your signed-in email fallback in this dev environment.
+            </p>
+          )}
         </div>
 
-        {/* Tabs */}
-        <div
-          className="mb-6 flex gap-1 rounded-xl p-1"
-          style={{ background: B06 }}
-        >
-          {tabs.map((tab) => (
+        {/* Tab bar */}
+        <div className="mb-6 flex gap-1 rounded-xl p-1" style={{ background: B06 }}>
+          {([
+            { id: "overview" as const, label: t("admin.tabOverview") },
+            { id: "users" as const, label: t("admin.tabUsers") },
+            { id: "content" as const, label: t("admin.tabContent") },
+          ] as const).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-              style={
-                activeTab === tab.id
-                  ? { background: SUR, color: B, boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }
-                  : { color: FGM }
-              }
+              className="flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+              style={activeTab === tab.id ? { background: SUR, color: B } : { color: FGM }}
             >
-              {tab.icon}
-              <span className="hidden sm:inline">{tab.label}</span>
+              {tab.label}
             </button>
           ))}
         </div>
 
-        {/* ── Overview ── */}
+        {/* ── Overview ───────────────────────────────────────────────────── */}
         {activeTab === "overview" && stats && (
           <div className="space-y-6">
             <StatGroup label={t("admin.userStats")}>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-                <StatCard icon={<Users       weight="duotone" className="h-5 w-5" />} label={t("admin.totalUsers")}         value={stats.totalUsers} />
-                <StatCard icon={<Sprout      weight="duotone" className="h-5 w-5" />} label={t("admin.farmers")}             value={stats.farmers} />
-                <StatCard icon={<ShoppingBag weight="duotone" className="h-5 w-5" />} label={t("admin.buyers")}              value={stats.buyers} />
-                <StatCard icon={<Shield      weight="duotone" className="h-5 w-5" />} label={t("admin.admins")}              value={stats.admins} />
-                <StatCard icon={<Globe       weight="duotone" className="h-5 w-5" />} label={t("admin.anonymousSessions")}   value={stats.anonymousSessions} />
+                <StatCard icon={<Users weight="duotone" className="h-5 w-5" />} label={t("admin.totalUsers")} value={stats.totalUsers} />
+                <StatCard icon={<Sprout weight="duotone" className="h-5 w-5" />} label={t("admin.farmers")} value={stats.farmers} />
+                <StatCard icon={<ShoppingBag weight="duotone" className="h-5 w-5" />} label={t("admin.buyers")} value={stats.buyers} />
+                <StatCard icon={<Shield weight="duotone" className="h-5 w-5" />} label={t("admin.admins")} value={stats.admins} />
+                <StatCard icon={<Globe weight="duotone" className="h-5 w-5" />} label={t("admin.anonymousSessions")} value={stats.anonymousSessions} />
               </div>
             </StatGroup>
 
             <StatGroup label={t("admin.systemUsage")}>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <StatCard icon={<FileText  weight="duotone" className="h-5 w-5" />} label={t("admin.totalEntries")}         value={stats.totalEntries} />
+                <StatCard icon={<FileText weight="duotone" className="h-5 w-5" />} label={t("admin.totalEntries")} value={stats.totalEntries} />
                 <StatCard icon={<Lightbulb weight="duotone" className="h-5 w-5" />} label={t("admin.totalRecommendations")} value={stats.totalRecommendations} />
-                <StatCard icon={<Bell      weight="duotone" className="h-5 w-5" />} label={t("admin.totalReminders")}       value={stats.totalReminders} />
-              </div>
-            </StatGroup>
-
-            <StatGroup label={t("admin.contentStats")}>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                <StatCard icon={<ShoppingBag weight="duotone" className="h-5 w-5" />} label={t("admin.totalBuyers")}       value={buyers?.length ?? 0} />
-                <StatCard icon={<BadgeCheck  weight="duotone" className="h-5 w-5" />} label={t("admin.verifiedBuyers")}    value={buyers?.filter((b) => b.isVerified).length ?? 0} />
-                <StatCard icon={<Star        weight="duotone" className="h-5 w-5" />} label={t("admin.pendingStories")}    value={stories?.filter((s) => !s.isApproved).length ?? 0} />
-                <StatCard icon={<BookOpen    weight="duotone" className="h-5 w-5" />} label={t("admin.publishedTutorials")} value={tutorials?.filter((tt) => tt.isPublished).length ?? 0} />
+                <StatCard icon={<Bell weight="duotone" className="h-5 w-5" />} label={t("admin.totalReminders")} value={stats.totalReminders} />
               </div>
             </StatGroup>
           </div>
         )}
 
-        {/* ── Users ── */}
+        {/* ── Users ──────────────────────────────────────────────────────── */}
         {activeTab === "users" && (
-          <section
-            className="overflow-hidden rounded-2xl border"
-            style={{ background: SUR, borderColor: BRD }}
-          >
+          <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
             <div className="flex items-center gap-4 border-b px-6 py-4" style={{ borderColor: BRD }}>
               <h2 className="flex-1 text-lg font-semibold" style={{ color: FG }}>
                 {t("admin.tabUsers")}
@@ -191,12 +374,7 @@ export function AdminDashboardClient() {
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                   className="rounded-lg border py-1.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2"
-                  style={{
-                    borderColor: BRD,
-                    background: BG,
-                    color: FG,
-                    "--tw-ring-color": B,
-                  } as React.CSSProperties}
+                  style={{ borderColor: BRD, background: BG, color: FG, "--tw-ring-color": B } as React.CSSProperties}
                 />
               </div>
             </div>
@@ -215,23 +393,14 @@ export function AdminDashboardClient() {
                   </thead>
                   <tbody>
                     {filteredUsers.map((user) => (
-                      <tr
-                        key={user._id}
-                        className="border-b transition-colors"
-                        style={{ borderColor: BRD }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = B06)}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
+                      <tr key={user._id} className="border-b" style={{ borderColor: BRD }}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <div
-                              className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                              style={{ background: B10, color: B }}
-                            >
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold" style={{ background: B10, color: B }}>
                               {user.name[0]?.toUpperCase()}
                             </div>
                             <span className="text-sm font-medium" style={{ color: FG }}>{user.name}</span>
-                            {user._id === currentUser._id && (
+                            {user._id === effectiveUser._id && (
                               <span className="text-xs" style={{ color: FGM }}>(you)</span>
                             )}
                           </div>
@@ -245,8 +414,8 @@ export function AdminDashboardClient() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select
                             value={user.role}
-                            onChange={(e) => updateRole({ userId: user._id as Id<"users">, role: e.target.value })}
-                            disabled={user._id === currentUser._id}
+                            onChange={(e) => handleRoleChange(user._id as Id<"users">, e.target.value)}
+                            disabled={user._id === effectiveUser._id}
                             className="rounded-lg border px-2 py-1 text-sm disabled:opacity-50"
                             style={{ borderColor: BRD, background: SUR, color: FG }}
                           >
@@ -269,223 +438,325 @@ export function AdminDashboardClient() {
           </section>
         )}
 
-        {/* ── Buyers ── */}
-        {activeTab === "buyers" && (
-          <section
-            className="overflow-hidden rounded-2xl border"
-            style={{ background: SUR, borderColor: BRD }}
-          >
-            <div className="border-b px-6 py-4" style={{ borderColor: BRD }}>
-              <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.tabBuyers")}</h2>
-              <p className="mt-0.5 text-sm" style={{ color: FGM }}>{t("admin.buyersSubtitle")}</p>
-            </div>
-
-            {buyers && buyers.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b" style={{ background: B06, borderColor: BRD }}>
-                      {[t("admin.colBusiness"), t("admin.colCounty"), t("admin.colProducts"), t("admin.colVerified"), t("admin.colActive")].map((h) => (
-                        <th key={h} className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: FGM }}>
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {buyers.map((buyer) => (
-                      <tr
-                        key={buyer._id}
-                        className="border-b transition-colors"
-                        style={{ borderColor: BRD }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = B06)}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-medium" style={{ color: FG }}>{buyer.businessName}</p>
-                          <p className="text-xs" style={{ color: FGM }}>{buyer.contactPerson} · {buyer.phone}</p>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm capitalize" style={{ color: FGM }}>
-                          {buyer.county.replace(/_/g, " ")}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {buyer.productTypes.slice(0, 2).map((type) => (
-                              <span
-                                key={type}
-                                className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                                style={{ background: B10, color: B }}
-                              >
-                                {type.replace(/_/g, " ")}
-                              </span>
-                            ))}
-                            {buyer.productTypes.length > 2 && (
-                              <span className="text-xs" style={{ color: FGM }}>
-                                +{buyer.productTypes.length - 2}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => setVerified({ id: buyer._id, isVerified: !buyer.isVerified })}
-                            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-opacity hover:opacity-80"
-                            style={
-                              buyer.isVerified
-                                ? { background: B10, color: B }
-                                : { background: "var(--brand-50)", color: FGM, outline: `1px solid ${BRD}` }
-                            }
-                          >
-                            {buyer.isVerified
-                              ? <><CheckCircle weight="duotone" className="h-3.5 w-3.5" /> {t("admin.verified")}</>
-                              : <><XCircle    weight="duotone" className="h-3.5 w-3.5" /> {t("admin.unverified")}</>}
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => setActive({ id: buyer._id, isActive: !buyer.isActive })}
-                            className="transition-opacity hover:opacity-75"
-                            title={buyer.isActive ? t("admin.deactivate") : t("admin.activate")}
-                          >
-                            {buyer.isActive
-                              ? <ToggleRight weight="duotone" className="h-6 w-6" style={{ color: B }} />
-                              : <ToggleLeft  weight="duotone" className="h-6 w-6" style={{ color: FGM }} />}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <EmptyState text={t("admin.noBuyers")} />
-            )}
-          </section>
-        )}
-
-        {/* ── Content ── */}
+        {/* ── Content ────────────────────────────────────────────────────── */}
         {activeTab === "content" && (
           <div className="space-y-6">
-            {/* Stories */}
-            <section
-              className="overflow-hidden rounded-2xl border"
-              style={{ background: SUR, borderColor: BRD }}
-            >
-              <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: BRD }}>
-                <div>
-                  <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.successStories")}</h2>
-                  <p className="mt-0.5 text-sm" style={{ color: FGM }}>{t("admin.storiesSubtitle")}</p>
-                </div>
-                {stories && (
-                  <span
-                    className="rounded-full px-2.5 py-0.5 text-xs font-medium"
-                    style={{ background: B10, color: B }}
+            {/* Content sub-tabs */}
+            <div className="flex gap-1 rounded-xl p-1 w-fit" style={{ background: B06 }}>
+              {([
+                { id: "tutorials" as const, label: t("admin.contentTabTutorials"), icon: <BookOpen weight="duotone" className="h-4 w-4" /> },
+                { id: "stories" as const, label: t("admin.contentTabStories"), icon: <Star weight="duotone" className="h-4 w-4" /> },
+              ] as const).map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => setContentSubTab(sub.id)}
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  style={contentSubTab === sub.id ? { background: SUR, color: B } : { color: FGM }}
+                >
+                  {sub.icon}
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            {/* ── Tutorials panel ─────────────────────────────────────────── */}
+            {contentSubTab === "tutorials" && (
+              <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
+                <div className="flex items-center border-b px-6 py-4" style={{ borderColor: BRD }}>
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.tutorials")}</h2>
+                    <p className="text-xs mt-0.5" style={{ color: FGM }}>{t("admin.tutorialsSubtitle")}</p>
+                  </div>
+                  <button
+                    onClick={() => { setShowCreateTutorial((v) => !v); }}
+                    className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
+                    style={{ background: B, color: "#fff" }}
                   >
-                    {stories.filter((s) => !s.isApproved).length} {t("admin.pending")}
-                  </span>
-                )}
-              </div>
-
-              {stories && stories.length > 0 ? (
-                <div>
-                  {stories.map((story) => (
-                    <div
-                      key={story._id}
-                      className="flex items-start gap-4 border-b px-6 py-4 last:border-0 transition-colors"
-                      style={{ borderColor: BRD }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = B06)}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-0.5 flex items-center gap-2">
-                          <p className="truncate text-sm font-medium" style={{ color: FG }}>{story.farmerName}</p>
-                          <span style={{ color: FGM }}>·</span>
-                          <span className="text-xs capitalize" style={{ color: FGM }}>{story.county.replace(/_/g, " ")}</span>
-                          <span style={{ color: FGM }}>·</span>
-                          <span className="text-xs" style={{ color: FGM }}>{story.method.replace(/_/g, " ")}</span>
-                        </div>
-                        <p className="line-clamp-2 text-xs" style={{ color: FGM }}>{story.story.en}</p>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <button
-                          onClick={() => setStoryApproved({ id: story._id, isApproved: !story.isApproved })}
-                          className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-opacity hover:opacity-80"
-                          style={
-                            story.isApproved
-                              ? { background: B10, color: B }
-                              : { background: "var(--brand-50)", color: FGM, outline: `1px solid ${BRD}` }
-                          }
-                        >
-                          {story.isApproved
-                            ? <><CheckCircle weight="duotone" className="h-3 w-3" /> {t("admin.approved")}</>
-                            : <><XCircle    weight="duotone" className="h-3 w-3" /> {t("admin.approve")}</>}
-                        </button>
-                        <button
-                          onClick={() => deleteStory({ id: story._id })}
-                          className="text-xs transition-opacity hover:opacity-60"
-                          style={{ color: FGM }}
-                        >
-                          {t("admin.delete")}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    <Plus weight="bold" className="h-4 w-4" />
+                    {t("admin.createTutorial")}
+                  </button>
                 </div>
-              ) : (
-                <EmptyState text={t("admin.noStories")} />
-              )}
-            </section>
 
-            {/* Tutorials */}
-            <section
-              className="overflow-hidden rounded-2xl border"
-              style={{ background: SUR, borderColor: BRD }}
-            >
-              <div className="border-b px-6 py-4" style={{ borderColor: BRD }}>
-                <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.tutorials")}</h2>
-                <p className="mt-0.5 text-sm" style={{ color: FGM }}>{t("admin.tutorialsSubtitle")}</p>
-              </div>
+                {/* Create tutorial form */}
+                {showCreateTutorial && (
+                  <div className="border-b px-6 py-6 space-y-4" style={{ borderColor: BRD, background: B06 }}>
+                    <h3 className="text-sm font-semibold" style={{ color: FG }}>{editingTutorialId ? t("admin.editTutorial") : t("admin.createTutorial")}</h3>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <FormField label={t("admin.titleEn")}>
+                        <input value={tutorialForm.titleEn} onChange={(e) => setTutorialForm((f) => ({ ...f, titleEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                      </FormField>
+                      <FormField label={t("admin.titleSw")}>
+                        <input value={tutorialForm.titleSw} onChange={(e) => setTutorialForm((f) => ({ ...f, titleSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                      </FormField>
+                      <FormField label={t("admin.descriptionEn")}>
+                        <textarea rows={2} value={tutorialForm.descEn} onChange={(e) => setTutorialForm((f) => ({ ...f, descEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                      </FormField>
+                      <FormField label={t("admin.descriptionSw")}>
+                        <textarea rows={2} value={tutorialForm.descSw} onChange={(e) => setTutorialForm((f) => ({ ...f, descSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                      </FormField>
+                      <FormField label={t("admin.category")}>
+                        <select value={tutorialForm.category} onChange={(e) => setTutorialForm((f) => ({ ...f, category: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
+                          {["composting", "biogas", "mulching", "animal_feed", "vermicompost"].map((c) => (
+                            <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
+                          ))}
+                        </select>
+                      </FormField>
+                      <FormField label={t("admin.difficulty")}>
+                        <select value={tutorialForm.difficulty} onChange={(e) => setTutorialForm((f) => ({ ...f, difficulty: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
+                          {["beginner", "intermediate", "advanced"].map((d) => (
+                            <option key={d} value={d}>{d}</option>
+                          ))}
+                        </select>
+                      </FormField>
+                      <FormField label={t("admin.duration")}>
+                        <input placeholder="e.g. 2–3 hours" value={tutorialForm.duration} onChange={(e) => setTutorialForm((f) => ({ ...f, duration: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                      </FormField>
+                    </div>
 
-              {tutorials && tutorials.length > 0 ? (
-                <div>
-                  {tutorials.map((tutorial) => (
-                    <div
-                      key={tutorial._id}
-                      className="flex items-center gap-4 border-b px-6 py-4 last:border-0 transition-colors"
-                      style={{ borderColor: BRD }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = B06)}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium" style={{ color: FG }}>{tutorial.title.en}</p>
-                        <div className="mt-0.5 flex items-center gap-2">
-                          <span className="text-xs capitalize" style={{ color: FGM }}>{tutorial.category.replace(/_/g, " ")}</span>
-                          <span style={{ color: FGM }}>·</span>
-                          <span className="text-xs" style={{ color: FGM }}>{tutorial.difficulty}</span>
-                          <span style={{ color: FGM }}>·</span>
-                          <span className="text-xs" style={{ color: FGM }}>{tutorial.viewCount} views</span>
+                    {/* Steps */}
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: FGM }}>Steps</p>
+                      {tutorialForm.steps.map((step, i) => (
+                        <div key={i} className="rounded-xl border p-4 space-y-3" style={{ background: SUR, borderColor: BRD }}>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold" style={{ color: B }}>Step {i + 1}</span>
+                            {tutorialForm.steps.length > 1 && (
+                              <button onClick={() => removeStep(i)} className="text-xs" style={{ color: FGM }}>
+                                {t("admin.removeStep")}
+                              </button>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <FormField label={t("admin.stepTitleEn")}>
+                              <input value={step.titleEn} onChange={(e) => updateStep(i, "titleEn", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                            </FormField>
+                            <FormField label={t("admin.stepTitleSw")}>
+                              <input value={step.titleSw} onChange={(e) => updateStep(i, "titleSw", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                            </FormField>
+                            <FormField label={t("admin.stepContentEn")}>
+                              <textarea rows={2} value={step.contentEn} onChange={(e) => updateStep(i, "contentEn", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                            </FormField>
+                            <FormField label={t("admin.stepContentSw")}>
+                              <textarea rows={2} value={step.contentSw} onChange={(e) => updateStep(i, "contentSw", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                            </FormField>
+                          </div>
                         </div>
-                      </div>
-                      <button
-                        onClick={() => setTutorialPublished({ id: tutorial._id, isPublished: !tutorial.isPublished })}
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-opacity hover:opacity-80"
-                        style={
-                          tutorial.isPublished
-                            ? { background: B10, color: B }
-                            : { background: "var(--brand-50)", color: FGM, outline: `1px solid ${BRD}` }
-                        }
-                      >
-                        {tutorial.isPublished
-                          ? <><CheckCircle weight="duotone" className="h-3 w-3" /> {t("admin.published")}</>
-                          : <><XCircle    weight="duotone" className="h-3 w-3" /> {t("admin.unpublished")}</>}
+                      ))}
+                      <button onClick={addStep} className="flex items-center gap-1.5 text-sm font-medium" style={{ color: B }}>
+                        <Plus weight="bold" className="h-3.5 w-3.5" />
+                        {t("admin.addStep")}
                       </button>
                     </div>
-                  ))}
+
+                    <div className="flex gap-3 pt-2">
+                      <button onClick={handleSaveTutorial} disabled={savingTutorial} className="rounded-lg px-5 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: B, color: "#fff" }}>
+                        {savingTutorial ? t("admin.creating") : editingTutorialId ? t("common.save") : t("admin.saveDraft")}
+                      </button>
+                      <button onClick={closeTutorialForm} className="rounded-lg px-5 py-2 text-sm font-medium" style={{ color: FGM }}>
+                        {t("common.cancel")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tutorials list */}
+                {tutorials && tutorials.length > 0 ? (
+                  <div className="divide-y" style={{ borderColor: BRD }}>
+                    {tutorials.map((tut) => {
+                      const es = emailState[tut._id];
+                      return (
+                        <div key={tut._id} className="flex flex-wrap items-center gap-3 px-6 py-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate" style={{ color: FG }}>{tut.title.en}</p>
+                            <p className="text-xs mt-0.5 capitalize" style={{ color: FGM }}>
+                              {tut.category.replace(/_/g, " ")} · {tut.difficulty} · {tut.steps.length} steps
+                            </p>
+                          </div>
+                          <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={tut.isPublished ? { background: "#dcfce7", color: "#166534" } : { background: B06, color: FGM }}>
+                            {tut.isPublished ? t("admin.published") : t("admin.unpublished")}
+                          </span>
+                          <button
+                            onClick={() => handleEditTutorial(tut)}
+                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                            style={{ borderColor: BRD, color: FG, background: SUR }}
+                          >
+                            <PencilSimple weight="duotone" className="h-3.5 w-3.5" />
+                            {t("admin.edit")}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTutorial(tut._id)}
+                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                            style={{ borderColor: BRD, color: "#dc2626", background: SUR }}
+                          >
+                            <Trash weight="duotone" className="h-3.5 w-3.5" />
+                            {t("admin.delete")}
+                          </button>
+                          <button
+                            onClick={() => setPublished({ id: tut._id, isPublished: !tut.isPublished })}
+                            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                            style={{ borderColor: BRD, color: FG, background: SUR }}
+                          >
+                            {tut.isPublished ? t("admin.unpublish") : t("admin.publish")}
+                          </button>
+                          <button
+                            onClick={() => handleSendTutorialEmail(tut._id)}
+                            disabled={es?.sending}
+                            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50 transition-colors"
+                            style={{ background: B10, color: B }}
+                          >
+                            {es?.sending
+                              ? <Loader2 weight="duotone" className="h-3.5 w-3.5 animate-spin" />
+                              : <PaperPlaneTilt weight="duotone" className="h-3.5 w-3.5" />
+                            }
+                            {es?.sending ? t("admin.sending") : t("admin.sendEmail")}
+                          </button>
+                          {es?.sent !== undefined && (
+                            <span className="text-xs" style={{ color: "#166534" }}>✓ {t("admin.emailSent", { count: es.sent })}</span>
+                          )}
+                          {es?.error && (
+                            <span className="text-xs text-red-500 max-w-xs truncate" title={es.error}>{es.error}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <EmptyState text={t("admin.noTutorials")} />
+                )}
+              </section>
+            )}
+
+            {/* ── Stories panel ────────────────────────────────────────────── */}
+            {contentSubTab === "stories" && (
+              <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
+                <div className="flex items-center border-b px-6 py-4" style={{ borderColor: BRD }}>
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.successStories")}</h2>
+                    <p className="text-xs mt-0.5" style={{ color: FGM }}>{t("admin.storiesSubtitle")}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateStory((v) => !v)}
+                    className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
+                    style={{ background: B, color: "#fff" }}
+                  >
+                    <Plus weight="bold" className="h-4 w-4" />
+                    {t("admin.createStory")}
+                  </button>
                 </div>
-              ) : (
-                <EmptyState text={t("admin.noTutorials")} />
-              )}
-            </section>
+
+                {/* Create story form */}
+                {showCreateStory && (
+                  <div className="border-b px-6 py-6 space-y-4" style={{ borderColor: BRD, background: B06 }}>
+                    <h3 className="text-sm font-semibold" style={{ color: FG }}>{editingStoryId ? t("admin.editStory") : t("admin.createStory")}</h3>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <FormField label={t("admin.farmerName")}>
+                        <input value={storyForm.farmerName} onChange={(e) => setStoryForm((f) => ({ ...f, farmerName: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                      </FormField>
+                      <FormField label={t("admin.method")}>
+                        <select value={storyForm.method} onChange={(e) => setStoryForm((f) => ({ ...f, method: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
+                          {["composting", "biogas", "mulching", "animal_feed", "vermicompost"].map((m) => (
+                            <option key={m} value={m}>{m.replace(/_/g, " ")}</option>
+                          ))}
+                        </select>
+                      </FormField>
+                      <FormField label={t("admin.colCounty")}>
+                        <input value={storyForm.county} onChange={(e) => setStoryForm((f) => ({ ...f, county: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                      </FormField>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <FormField label={t("admin.storyEn")}>
+                        <textarea rows={4} value={storyForm.storyEn} onChange={(e) => setStoryForm((f) => ({ ...f, storyEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                      </FormField>
+                      <FormField label={t("admin.storySw")}>
+                        <textarea rows={4} value={storyForm.storySw} onChange={(e) => setStoryForm((f) => ({ ...f, storySw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                      </FormField>
+                      <FormField label={t("admin.resultsEn")}>
+                        <textarea rows={3} value={storyForm.resultsEn} onChange={(e) => setStoryForm((f) => ({ ...f, resultsEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                      </FormField>
+                      <FormField label={t("admin.resultsSw")}>
+                        <textarea rows={3} value={storyForm.resultsSw} onChange={(e) => setStoryForm((f) => ({ ...f, resultsSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                      </FormField>
+                    </div>
+                    <div className="flex gap-3 pt-2">
+                      <button onClick={handleSaveStory} disabled={savingStory} className="rounded-lg px-5 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: B, color: "#fff" }}>
+                        {savingStory ? t("admin.creating") : t("common.save")}
+                      </button>
+                      <button onClick={closeStoryForm} className="rounded-lg px-5 py-2 text-sm font-medium" style={{ color: FGM }}>
+                        {t("common.cancel")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stories list */}
+                {stories && stories.length > 0 ? (
+                  <div className="divide-y" style={{ borderColor: BRD }}>
+                    {stories.map((story) => {
+                      const es = emailState[story._id];
+                      return (
+                        <div key={story._id} className="flex flex-wrap items-center gap-3 px-6 py-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium" style={{ color: FG }}>{story.farmerName}</p>
+                            <p className="text-xs mt-0.5 capitalize" style={{ color: FGM }}>
+                              {story.method.replace(/_/g, " ")} · {story.county.replace(/_/g, " ")}
+                            </p>
+                          </div>
+                          <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={story.isApproved ? { background: "#dcfce7", color: "#166534" } : { background: "#fef9c3", color: "#854d0e" }}>
+                            {story.isApproved ? t("admin.approved") : t("admin.pending")}
+                          </span>
+                          {!story.isApproved && (
+                            <button
+                              onClick={() => setApproved({ id: story._id, isApproved: true })}
+                              className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                              style={{ borderColor: BRD, color: "#166534", background: SUR }}
+                            >
+                              <CheckCircle weight="duotone" className="h-3.5 w-3.5" />
+                              {t("admin.approve")}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleEditStory(story)}
+                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                            style={{ borderColor: BRD, color: FG, background: SUR }}
+                          >
+                            <PencilSimple weight="duotone" className="h-3.5 w-3.5" />
+                            {t("admin.edit")}
+                          </button>
+                          <button
+                            onClick={() => deleteStory({ id: story._id })}
+                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                            style={{ borderColor: BRD, color: "#dc2626", background: SUR }}
+                          >
+                            <Trash weight="duotone" className="h-3.5 w-3.5" />
+                            {t("admin.delete")}
+                          </button>
+                          <button
+                            onClick={() => handleSendStoryEmail(story._id)}
+                            disabled={es?.sending}
+                            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                            style={{ background: B10, color: B }}
+                          >
+                            {es?.sending
+                              ? <Loader2 weight="duotone" className="h-3.5 w-3.5 animate-spin" />
+                              : <PaperPlaneTilt weight="duotone" className="h-3.5 w-3.5" />
+                            }
+                            {es?.sending ? t("admin.sending") : t("admin.sendEmail")}
+                          </button>
+                          {es?.sent !== undefined && (
+                            <span className="text-xs" style={{ color: "#166534" }}>✓ {t("admin.emailSent", { count: es.sent })}</span>
+                          )}
+                          {es?.error && (
+                            <span className="text-xs text-red-500 max-w-xs truncate" title={es.error}>{es.error}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <EmptyState text={t("admin.noStories")} />
+                )}
+              </section>
+            )}
           </div>
         )}
       </div>
@@ -493,7 +764,14 @@ export function AdminDashboardClient() {
   );
 }
 
-/* ── helpers ── */
+function FormField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="mb-1 block text-xs font-medium" style={{ color: "var(--foreground-muted)" }}>{label}</label>
+      {children}
+    </div>
+  );
+}
 
 function StatGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -508,14 +786,8 @@ function StatGroup({ label, children }: { label: string; children: React.ReactNo
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div
-      className="rounded-xl border p-4"
-      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-    >
-      <div
-        className="mb-3 inline-flex rounded-lg p-2"
-        style={{ background: "rgba(6,64,43,0.08)", color: "#06402B" }}
-      >
+    <div className="rounded-xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+      <div className="mb-3 inline-flex rounded-lg p-2" style={{ background: "rgba(6,64,43,0.08)", color: "#06402B" }}>
         {icon}
       </div>
       <div className="font-display text-2xl font-bold italic" style={{ color: "var(--foreground)" }}>

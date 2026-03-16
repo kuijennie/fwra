@@ -10,9 +10,7 @@ export default defineSchema({
     email: v.optional(v.string()),
     role: v.string(), // 'farmer' | 'buyer' | 'admin'
     county: v.string(),
-    subCounty: v.optional(v.string()),
-    preferredLanguage: v.string(), // 'en', 'sw', 'ki', 'lu', 'ka'
-    farmSize: v.optional(v.number()), // in acres
+    preferredLanguage: v.string(), // 'en', 'sw'
     createdAt: v.number(),
     lastActive: v.number(),
   })
@@ -151,7 +149,6 @@ export default defineSchema({
       en: v.string(),
       sw: v.string(),
     }),
-    imageUrls: v.optional(v.array(v.string())),
     isApproved: v.boolean(),
     createdAt: v.number(),
   })
@@ -199,6 +196,29 @@ export default defineSchema({
     .index("by_verified", ["isVerified"])
     .index("by_active", ["isActive"]),
 
+  // Waste product listings posted by farmers after refining
+  wasteListings: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    wasteType: v.string(), // 'compost', 'biogas_slurry', 'silage', 'mulch', 'animal_feed', 'vermicompost', 'bio_fertilizer', 'other'
+    processedFrom: v.optional(v.string()), // original waste e.g. 'maize_stalks'
+    quantityKg: v.number(),
+    pricePerKg: v.optional(v.number()), // KES, null = negotiable
+    county: v.string(),
+    subCounty: v.optional(v.string()),
+    description: v.string(),
+    contactPhone: v.string(),
+    contactWhatsapp: v.optional(v.string()),
+    status: v.string(), // 'available' | 'sold' | 'expired'
+    imageUrls: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_county", ["county"])
+    .index("by_waste_type", ["wasteType"]),
+
   // User reminders for tasks
   reminders: defineTable({
     sessionId: v.string(),
@@ -227,35 +247,4 @@ export default defineSchema({
     .index("by_session", ["sessionId"])
     .index("by_user", ["userId"])
     .index("by_due_date", ["dueDate"])
-    .index("by_completed", ["isCompleted"]),
-
-  // Legal documents and guidelines
-  legalDocuments: defineTable({
-    slug: v.string(),
-    title: v.object({
-      en: v.string(),
-      sw: v.string(),
-    }),
-    content: v.object({
-      en: v.string(),
-      sw: v.string(),
-    }),
-    summary: v.object({
-      en: v.string(),
-      sw: v.string(),
-    }),
-    category: v.string(), // 'waste_management_act', 'sorting_guidelines', 'permits'
-    keyPoints: v.array(
-      v.object({
-        en: v.string(),
-        sw: v.string(),
-      })
-    ),
-    effectiveDate: v.optional(v.string()),
-    lastUpdated: v.number(),
-    isPublished: v.boolean(),
-  })
-    .index("by_slug", ["slug"])
-    .index("by_category", ["category"])
-    .index("by_published", ["isPublished"]),
-});
+    .index("by_completed", ["isCompleted"])});

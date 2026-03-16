@@ -9,8 +9,7 @@
  */
 
 import type * as buyers from "../buyers.js";
-import type * as init from "../init.js";
-import type * as legalDocuments from "../legalDocuments.js";
+import type * as email from "../email.js";
 import type * as recommendations from "../recommendations.js";
 import type * as reminders from "../reminders.js";
 import type * as reports from "../reports.js";
@@ -22,6 +21,7 @@ import type * as successStories from "../successStories.js";
 import type * as tutorials from "../tutorials.js";
 import type * as users from "../users.js";
 import type * as wasteEntries from "../wasteEntries.js";
+import type * as wasteListings from "../wasteListings.js";
 
 import type {
   ApiFromModules,
@@ -31,8 +31,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   buyers: typeof buyers;
-  init: typeof init;
-  legalDocuments: typeof legalDocuments;
+  email: typeof email;
   recommendations: typeof recommendations;
   reminders: typeof reminders;
   reports: typeof reports;
@@ -44,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   tutorials: typeof tutorials;
   users: typeof users;
   wasteEntries: typeof wasteEntries;
+  wasteListings: typeof wasteListings;
 }>;
 
 /**

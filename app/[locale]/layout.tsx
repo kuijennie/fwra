@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SkipLink } from "@/components/accessibility";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { UserBootstrap } from "@/components/auth/user-bootstrap";
+import { RoleSelectionModal } from "@/components/auth/role-selection-modal";
 
 type Props = {
   children: React.ReactNode;
@@ -29,6 +31,8 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <UserBootstrap />
+      <RoleSelectionModal />
       <SkipLink />
       <div className="flex min-h-screen flex-col">
         <Header />

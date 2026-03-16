@@ -4,34 +4,34 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Leaf, List as Menu, X } from "@phosphor-icons/react";
 import { useState } from "react";
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, SignInButton, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LanguageSwitcher } from "./language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { getDesktopNavItems } from "@/lib/auth/roles";
 
 const BRAND = "#06402B";
 
-const navLinks = [
-  { href: "/waste-input", key: "nav.logWaste" },
-  { href: "/recommendations", key: "nav.recommendations" },
-  { href: "/tutorials", key: "nav.tutorials" },
-  { href: "/marketplace", key: "nav.marketplace" },
-  { href: "/success-stories", key: "nav.stories" },
-  { href: "/reports", key: "nav.reports" },
-] as const;
-
 const mobileOnlyLinks = [
-  { href: "/reminders", key: "nav.reminders" },
-  { href: "/legal", key: "nav.legal" },
-  { href: "/profile", key: "nav.profile" },
+  { href: "/reminders", labelKey: "nav.reminders" },
+  { href: "/legal", labelKey: "nav.legal" },
+  { href: "/profile", labelKey: "nav.profile" },
 ] as const;
 
 export function Header() {
   const t = useTranslations();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useUser();
   const currentUser = useQuery(api.users.getCurrent);
-  const isAdmin = currentUser?.role === "admin";
+  const signedInEmail = user?.primaryEmailAddress?.emailAddress;
+  const fallbackUser = useQuery(
+    api.users.getByEmail,
+    signedInEmail ? { email: signedInEmail } : "skip"
+  );
+  const effectiveRole = currentUser?.role ?? fallbackUser?.role;
+  const navLinks = getDesktopNavItems(effectiveRole);
+  const showMobileOnlyLinks = effectiveRole !== "buyer" && effectiveRole !== "admin";
 
   return (
     <header className="sticky top-0 z-50" style={{ background: BRAND }}>
@@ -59,18 +59,9 @@ export function Header() {
                 href={link.href}
                 className="rounded-md px-3 py-1.5 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
               >
-                {t(link.key)}
+                {t(link.labelKey)}
               </Link>
             ))}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="ml-2 rounded-md px-3 py-1.5 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
-                style={{ outline: "1px solid rgba(255,255,255,0.22)" }}
-              >
-                {t("nav.admin")}
-              </Link>
-            )}
           </nav>
 
           {/* Right side */}
@@ -94,7 +85,7 @@ export function Header() {
                   className="rounded-md px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
                   style={{ background: "rgba(255,255,255,0.12)", outline: "1px solid rgba(255,255,255,0.22)" }}
                 >
-                  {t("nav.signIn")}
+                  {t.has("nav.signIn") ? t("nav.signIn") : t("common.getStarted")}
                 </button>
               </SignInButton>
             </SignedOut>
@@ -121,29 +112,20 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                   className="rounded-md px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  {t(link.key)}
+                  {t(link.labelKey)}
                 </Link>
               ))}
-              {mobileOnlyLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="rounded-md px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                >
-                  {t(link.key)}
-                </Link>
-              ))}
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="mt-1 rounded-md px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
-                  style={{ outline: "1px solid rgba(255,255,255,0.22)" }}
-                >
-                  {t("nav.admin")}
-                </Link>
-              )}
+              {showMobileOnlyLinks &&
+                mobileOnlyLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="rounded-md px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    {t(link.labelKey)}
+                  </Link>
+                ))}
             </div>
           </nav>
         )}

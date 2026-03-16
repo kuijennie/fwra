@@ -8,10 +8,8 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import { Shield, ShoppingBag, Plant as Sprout } from "@phosphor-icons/react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useSession } from "@/lib/hooks";
-import { useEffect, useRef } from "react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export default function ProfilePage() {
@@ -21,22 +19,7 @@ export default function ProfilePage() {
 function ProfileContent() {
   const t = useTranslations("profile");
   const { user: clerkUser, isSignedIn } = useUser();
-  const { sessionId } = useSession();
-
   const convexUser = useQuery(api.users.getCurrent);
-  const getOrCreate = useMutation(api.users.getOrCreateFromClerk);
-  const linkSession = useMutation(api.users.linkSessionToUser);
-
-  const hasLinked = useRef(false);
-
-  useEffect(() => {
-    if (isSignedIn && sessionId && !hasLinked.current) {
-      hasLinked.current = true;
-      getOrCreate({}).then(() => {
-        linkSession({ sessionId });
-      });
-    }
-  }, [isSignedIn, sessionId, getOrCreate, linkSession]);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8">

@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
+import { mutation, query, internalQuery, QueryCtx, MutationCtx } from "./_generated/server";
 import { Doc } from "./_generated/dataModel";
 
 async function getCallerWithRole(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
@@ -121,6 +121,82 @@ export const adminListAll = query({
     const caller = await getCallerWithRole(ctx);
     if (!caller || caller.role !== "admin") return null;
     return await ctx.db.query("tutorials").order("desc").collect();
+  },
+});
+
+// Internal: get by ID (used by email action)
+export const getByIdInternal = internalQuery({
+  args: { id: v.id("tutorials") },
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
+  },
+});
+
+// Admin: create a new tutorial
+export const adminCreate = mutation({
+  args: {
+    slug: v.string(),
+    category: v.string(),
+    title: v.object({ en: v.string(), sw: v.string() }),
+    description: v.object({ en: v.string(), sw: v.string() }),
+    difficulty: v.string(),
+    duration: v.string(),
+    steps: v.array(
+      v.object({
+        stepNumber: v.number(),
+        title: v.object({ en: v.string(), sw: v.string() }),
+        content: v.object({ en: v.string(), sw: v.string() }),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    return await ctx.db.insert("tutorials", {
+      ...args,
+      applicableWasteTypes: [],
+      requiredResources: [],
+      viewCount: 0,
+      isPublished: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+// Admin: update an existing tutorial
+export const adminUpdate = mutation({
+  args: {
+    id: v.id("tutorials"),
+    category: v.string(),
+    title: v.object({ en: v.string(), sw: v.string() }),
+    description: v.object({ en: v.string(), sw: v.string() }),
+    difficulty: v.string(),
+    duration: v.string(),
+    steps: v.array(
+      v.object({
+        stepNumber: v.number(),
+        title: v.object({ en: v.string(), sw: v.string() }),
+        content: v.object({ en: v.string(), sw: v.string() }),
+      })
+    ),
+  },
+  handler: async (ctx, { id, ...rest }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    await ctx.db.patch(id, { ...rest, updatedAt: Date.now() });
+    return { success: true };
+  },
+});
+
+// Admin: delete a tutorial
+export const adminDelete = mutation({
+  args: { id: v.id("tutorials") },
+  handler: async (ctx, { id }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    await ctx.db.delete(id);
+    return { success: true };
   },
 });
 

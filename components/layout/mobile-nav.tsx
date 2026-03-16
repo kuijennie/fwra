@@ -2,20 +2,51 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/i18n/navigation";
-import { House as Home, Leaf, BookOpen, Storefront as Store, User } from "@phosphor-icons/react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useUser } from "@clerk/nextjs";
+import {
+  House as Home,
+  Leaf,
+  BookOpen,
+  Storefront as Store,
+  User,
+  Lightbulb,
+  Shield,
+  Star,
+  Plant as Sprout,
+  ShoppingBag,
+  Tag,
+} from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { getMobileNavItems } from "@/lib/auth/roles";
 
-const navItems = [
-  { href: "/", icon: Home, labelKey: "nav.home" },
-  { href: "/waste-input", icon: Leaf, labelKey: "nav.logWaste" },
-  { href: "/tutorials", icon: BookOpen, labelKey: "nav.tutorials" },
-  { href: "/marketplace", icon: Store, labelKey: "nav.marketplace" },
-  { href: "/profile", icon: User, labelKey: "nav.profile" },
-] as const;
+const iconMap = {
+  "/": Home,
+  "/admin": Shield,
+  "/buyer": ShoppingBag,
+  "/farmer": Sprout,
+  "/farmer/sell": Tag,
+  "/marketplace": Store,
+  "/profile": User,
+  "/recommendations": Lightbulb,
+  "/success-stories": Star,
+  "/tutorials": BookOpen,
+  "/waste-input": Leaf,
+} as const;
 
 export function MobileNav() {
   const t = useTranslations();
   const pathname = usePathname();
+  const { user } = useUser();
+  const currentUser = useQuery(api.users.getCurrent);
+  const signedInEmail = user?.primaryEmailAddress?.emailAddress;
+  const fallbackUser = useQuery(
+    api.users.getByEmail,
+    signedInEmail ? { email: signedInEmail } : "skip"
+  );
+  const effectiveRole = currentUser?.role ?? fallbackUser?.role;
+  const navItems = getMobileNavItems(effectiveRole);
 
   return (
     <nav
@@ -33,6 +64,7 @@ export function MobileNav() {
               item.href === "/"
                 ? pathname === "/"
                 : pathname.startsWith(item.href);
+            const Icon = iconMap[item.href as keyof typeof iconMap] ?? User;
 
             return (
               <Link
@@ -45,7 +77,7 @@ export function MobileNav() {
                     : "text-[#4a6b58] hover:text-[#06402B]"
                 )}
               >
-                <item.icon
+                <Icon
                   weight="duotone"
                   className={cn(
                     "h-5 w-5 transition-colors",

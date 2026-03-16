@@ -1,7 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useQuery } from "convex/react";
 import { Link } from "@/lib/i18n/navigation";
+import { api } from "@/convex/_generated/api";
 import {
   Leaf,
   Lightbulb,
@@ -14,11 +16,19 @@ import {
 
 export function HomeContent() {
   const t = useTranslations();
+  const currentUser = useQuery(api.users.getCurrent);
+  const role = currentUser?.role;
+  const primaryHref = role === "admin" ? "/admin" : role === "buyer" ? "/marketplace" : role === "farmer" ? "/farmer" : "/waste-input";
+  const quickActions = getHomeQuickActions(role);
+  const roleSubtitle =
+    role === "admin"
+      ? t("admin.subtitle")
+      : role === "buyer"
+        ? t("marketplace.subtitle")
+        : t("home.subtitle");
 
   return (
     <main className="min-h-screen" style={{ background: "var(--background)" }}>
-
-      {/* Hero */}
       <section className="px-4 pb-10 pt-14 text-center">
         <div className="mx-auto max-w-2xl">
           <div className="mb-5 flex justify-center">
@@ -36,20 +46,19 @@ export function HomeContent() {
             {t("home.welcome")}
           </h1>
           <p className="mb-8 text-lg leading-relaxed" style={{ color: "var(--foreground-muted)" }}>
-            {t("home.subtitle")}
+            {roleSubtitle}
           </p>
           <Link
-            href="/waste-input"
+            href={primaryHref}
             className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90"
             style={{ background: "#06402B" }}
           >
-            {t("common.getStarted")}
+            {t(getPrimaryCtaKey(role))}
             <ArrowRight weight="duotone" className="h-4 w-4" />
           </Link>
         </div>
       </section>
 
-      {/* Quick Actions */}
       <section className="px-4 py-10">
         <div className="mx-auto max-w-4xl">
           <h2
@@ -59,29 +68,19 @@ export function HomeContent() {
             {t("home.quickActions")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            <QuickActionCard
-              href="/waste-input"
-              icon={<Leaf weight="duotone" className="h-5 w-5" />}
-              title={t("home.logWasteAction")}
-              description={t("home.logWasteDesc")}
-            />
-            <QuickActionCard
-              href="/recommendations"
-              icon={<Lightbulb weight="duotone" className="h-5 w-5" />}
-              title={t("home.getRecommendations")}
-              description={t("home.getRecommendationsDesc")}
-            />
-            <QuickActionCard
-              href="/tutorials"
-              icon={<BookOpen weight="duotone" className="h-5 w-5" />}
-              title={t("home.browseTutorials")}
-              description={t("home.browseTutorialsDesc")}
-            />
+            {quickActions.map((action) => (
+              <QuickActionCard
+                key={action.href}
+                href={action.href}
+                icon={action.icon}
+                title={t(action.titleKey)}
+                description={t(action.descriptionKey)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Recycling Methods */}
       <section className="px-4 py-10" style={{ background: "var(--surface)" }}>
         <div className="mx-auto max-w-4xl">
           <h2
@@ -99,7 +98,6 @@ export function HomeContent() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="px-4 py-14">
         <div className="mx-auto max-w-4xl">
           <div
@@ -113,15 +111,14 @@ export function HomeContent() {
               The numbers that drive our mission
             </p>
             <div className="grid gap-8 sm:grid-cols-3">
-              <StatItem value="3,000–4,000" label="tons of waste daily in Kenya" />
+              <StatItem value="3,000-4,000" label="tons of waste daily in Kenya" />
               <StatItem value="80%" label="of Nairobi waste is organic" />
-              <StatItem value="30–40%" label="of food is lost or wasted" />
+              <StatItem value="30-40%" label="of food is lost or wasted" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
       <section className="px-4 pb-16 pt-4 text-center">
         <div className="mx-auto max-w-xl">
           <h2
@@ -131,14 +128,14 @@ export function HomeContent() {
             Ready to turn waste into value?
           </h2>
           <p className="mb-7 text-sm leading-relaxed" style={{ color: "var(--foreground-muted)" }}>
-            Start by logging your farm waste and get personalized recycling recommendations.
+            Start with the next action that fits your role.
           </p>
           <Link
-            href="/waste-input"
+            href={primaryHref}
             className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90"
             style={{ background: "#06402B" }}
           >
-            {t("home.logWasteAction")}
+            {t(getPrimaryCtaKey(role))}
             <ArrowRight weight="duotone" className="h-4 w-4" />
           </Link>
         </div>
@@ -217,4 +214,103 @@ function StatItem({ value, label }: { value: string; label: string }) {
       </div>
     </div>
   );
+}
+
+function getPrimaryCtaKey(role: string | null | undefined) {
+  if (role === "admin") return "roles.admin";
+  if (role === "buyer") return "nav.marketplace";
+  if (role === "farmer") return "nav.farmer";
+  return "home.logWasteAction";
+}
+
+function getHomeQuickActions(role: string | null | undefined) {
+  if (role === "admin") {
+    return [
+      {
+        href: "/admin",
+        icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
+        titleKey: "roles.admin",
+        descriptionKey: "admin.subtitle",
+      },
+      {
+        href: "/marketplace",
+        icon: <Leaf weight="duotone" className="h-5 w-5" />,
+        titleKey: "nav.marketplace",
+        descriptionKey: "marketplace.subtitle",
+      },
+      {
+        href: "/tutorials",
+        icon: <BookOpen weight="duotone" className="h-5 w-5" />,
+        titleKey: "nav.tutorials",
+        descriptionKey: "tutorials.subtitle",
+      },
+    ];
+  }
+
+  if (role === "buyer") {
+    return [
+      {
+        href: "/marketplace",
+        icon: <Leaf weight="duotone" className="h-5 w-5" />,
+        titleKey: "nav.marketplace",
+        descriptionKey: "marketplace.subtitle",
+      },
+      {
+        href: "/tutorials",
+        icon: <BookOpen weight="duotone" className="h-5 w-5" />,
+        titleKey: "home.browseTutorials",
+        descriptionKey: "home.browseTutorialsDesc",
+      },
+      {
+        href: "/profile",
+        icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
+        titleKey: "nav.profile",
+        descriptionKey: "profile.subtitle",
+      },
+    ];
+  }
+
+  if (role === "farmer") {
+    return [
+      {
+        href: "/farmer",
+        icon: <Sprout weight="duotone" className="h-5 w-5" />,
+        titleKey: "nav.farmer",
+        descriptionKey: "farmerDashboard.subtitle",
+      },
+      {
+        href: "/waste-input",
+        icon: <Leaf weight="duotone" className="h-5 w-5" />,
+        titleKey: "home.logWasteAction",
+        descriptionKey: "home.logWasteDesc",
+      },
+      {
+        href: "/recommendations",
+        icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
+        titleKey: "home.getRecommendations",
+        descriptionKey: "home.getRecommendationsDesc",
+      },
+    ];
+  }
+
+  return [
+    {
+      href: "/waste-input",
+      icon: <Leaf weight="duotone" className="h-5 w-5" />,
+      titleKey: "home.logWasteAction",
+      descriptionKey: "home.logWasteDesc",
+    },
+    {
+      href: "/recommendations",
+      icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
+      titleKey: "home.getRecommendations",
+      descriptionKey: "home.getRecommendationsDesc",
+    },
+    {
+      href: "/tutorials",
+      icon: <BookOpen weight="duotone" className="h-5 w-5" />,
+      titleKey: "home.browseTutorials",
+      descriptionKey: "home.browseTutorialsDesc",
+    },
+  ];
 }

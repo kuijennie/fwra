@@ -1,4 +1,4 @@
-import { query, mutation, QueryCtx, MutationCtx } from "./_generated/server";
+import { query, mutation, internalQuery, QueryCtx, MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 
@@ -39,6 +39,52 @@ export const getById = query({
   args: { id: v.id("successStories") },
   handler: async (ctx, { id }) => {
     return await ctx.db.get(id);
+  },
+});
+
+// Internal: get by ID (used by email action)
+export const getByIdInternal = internalQuery({
+  args: { id: v.id("successStories") },
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
+  },
+});
+
+// Admin: create a new story
+export const adminCreate = mutation({
+  args: {
+    farmerName: v.string(),
+    county: v.string(),
+    method: v.string(),
+    story: v.object({ en: v.string(), sw: v.string() }),
+    results: v.object({ en: v.string(), sw: v.string() }),
+  },
+  handler: async (ctx, args) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    return await ctx.db.insert("successStories", {
+      ...args,
+      isApproved: false,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Admin: update an existing story
+export const adminUpdate = mutation({
+  args: {
+    id: v.id("successStories"),
+    farmerName: v.string(),
+    county: v.string(),
+    method: v.string(),
+    story: v.object({ en: v.string(), sw: v.string() }),
+    results: v.object({ en: v.string(), sw: v.string() }),
+  },
+  handler: async (ctx, { id, ...rest }) => {
+    const caller = await getCallerWithRole(ctx);
+    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+    await ctx.db.patch(id, rest);
+    return { success: true };
   },
 });
 

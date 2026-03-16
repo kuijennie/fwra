@@ -3,9 +3,9 @@
 // then uncomment the provider below.
 export default {
   providers: [
-    // {
-    //   domain: process.env.CLERK_ISSUER_URL,
-    //   applicationID: "convex",
-    // },
+    {
+      domain: process.env.CLERK_ISSUER_URL,
+      applicationID: "convex",
+    },
   ],
 };
