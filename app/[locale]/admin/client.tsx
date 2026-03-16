@@ -91,14 +91,13 @@ export function AdminDashboardClient() {
   const effectiveUser = currentUser ?? fallbackUser;
   const useFallback = !currentUser && !!adminEmail;
 
-  const stats = useQuery(
-    useFallback ? api.users.getStatsByEmail : api.users.getStats,
-    useFallback ? { adminEmail: adminEmail! } : {}
-  );
-  const users = useQuery(
-    useFallback ? api.users.listAllByEmail : api.users.listAll,
-    useFallback ? { adminEmail: adminEmail! } : {}
-  );
+  const statsJwt = useQuery(api.users.getStats, !useFallback ? {} : "skip");
+  const statsFallback = useQuery(api.users.getStatsByEmail, useFallback ? { adminEmail: adminEmail! } : "skip");
+  const stats = statsJwt ?? statsFallback;
+
+  const usersJwt = useQuery(api.users.listAll, !useFallback ? {} : "skip");
+  const usersFallback = useQuery(api.users.listAllByEmail, useFallback ? { adminEmail: adminEmail! } : "skip");
+  const users = usersJwt ?? usersFallback;
 
   const tutorials = useQuery(api.tutorials.adminListAll);
   const stories = useQuery(api.successStories.adminListAll);

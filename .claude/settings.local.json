@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm add @phosphor-icons/react)"
+      "Bash(pnpm add @phosphor-icons/react)",
+      "Bash(pnpm build:*)"
     ]
   }
 }

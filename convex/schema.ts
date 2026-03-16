@@ -8,9 +8,11 @@ export default defineSchema({
     name: v.string(),
     phone: v.optional(v.string()),
     email: v.optional(v.string()),
-    role: v.string(), // 'farmer' | 'buyer' | 'admin'
+    role: v.string(), // 'farmer' | 'buyer' | 'admin' | 'pending'
     county: v.string(),
+    subCounty: v.optional(v.string()),
     preferredLanguage: v.string(), // 'en', 'sw'
+    farmSize: v.optional(v.number()), // acres
     createdAt: v.number(),
     lastActive: v.number(),
   })
@@ -218,6 +220,22 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_county", ["county"])
     .index("by_waste_type", ["wasteType"]),
+
+  // Legal documents (acts, guidelines, permits)
+  legalDocuments: defineTable({
+    slug: v.string(),
+    category: v.string(), // 'waste_management_act' | 'sorting_guidelines' | 'permits'
+    title: v.object({ en: v.string(), sw: v.string() }),
+    summary: v.object({ en: v.string(), sw: v.string() }),
+    content: v.object({ en: v.string(), sw: v.string() }),
+    effectiveDate: v.optional(v.string()),
+    isPublished: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_category", ["category"])
+    .index("by_published", ["isPublished"]),
 
   // User reminders for tasks
   reminders: defineTable({

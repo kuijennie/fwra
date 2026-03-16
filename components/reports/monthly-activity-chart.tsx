@@ -149,7 +149,7 @@ export function MonthlyActivityChart({ data }: Props) {
                 dataKey="count"
                 position="top"
                 style={{ fill: labelColor, fontSize: 10, fontWeight: 600 }}
-                formatter={(v: number) => (v === 0 ? "" : v)}
+                formatter={(v: unknown) => (v === 0 ? "" : (v as number))}
               />
             </Bar>
           </BarChart>
