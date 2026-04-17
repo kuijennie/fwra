@@ -1,9 +1,17 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 import {
-  Grains, Barn, ForkKnife, ArrowsCounterClockwise,
-  Plant, Leaf, Drop, Coffee, Flower,
+  GrainsIcon,
+  BarnIcon,
+  ForkKnifeIcon,
+  ArrowsCounterClockwiseIcon,
+  PlantIcon,
+  LeafIcon,
+  DropIcon,
+  CoffeeIcon,
+  FlowerIcon,
   type Icon,
 } from "@phosphor-icons/react";
 import {
@@ -20,29 +28,29 @@ interface WasteTypeSelectorProps {
 }
 
 const categoryIconMap: Record<string, Icon> = {
-  crop_residue: Grains,
-  manure:       Barn,
-  food_scraps:  ForkKnife,
-  other:        ArrowsCounterClockwise,
+  crop_residue: GrainsIcon,
+  manure:       BarnIcon,
+  food_scraps:  ForkKnifeIcon,
+  other:        ArrowsCounterClockwiseIcon,
 };
 
 const subTypeIconMap: Record<string, Icon> = {
-  maize_stalks:        Grains,
-  wheat_straw:         Grains,
-  rice_husks:          Grains,
-  sugarcane_bagasse:   Plant,
-  bean_residue:        Flower,
-  vegetable_trimmings: Leaf,
-  fruit_peels:         Drop,
-  coffee_pulp:         Coffee,
-  tea_waste:           Coffee,
-  cow_dung:            Barn,
-  goat_droppings:      Barn,
-  chicken_manure:      Barn,
-  pig_manure:          Barn,
-  vegetable_peels:     Leaf,
-  food_leftovers:      ForkKnife,
-  spoiled_produce:     Plant,
+  maize_stalks:        GrainsIcon,
+  wheat_straw:         GrainsIcon,
+  rice_husks:          GrainsIcon,
+  sugarcane_bagasse:   PlantIcon,
+  bean_residue:        FlowerIcon,
+  vegetable_trimmings: LeafIcon,
+  fruit_peels:         DropIcon,
+  coffee_pulp:         CoffeeIcon,
+  tea_waste:           CoffeeIcon,
+  cow_dung:            BarnIcon,
+  goat_droppings:      BarnIcon,
+  chicken_manure:      BarnIcon,
+  pig_manure:          BarnIcon,
+  vegetable_peels:     LeafIcon,
+  food_leftovers:      ForkKnifeIcon,
+  spoiled_produce:     PlantIcon,
 };
 
 export function WasteTypeSelector({
@@ -61,37 +69,45 @@ export function WasteTypeSelector({
     <div className="space-y-6">
       {/* Category Selection */}
       <div>
-        <label className="block text-sm font-medium mb-3" style={{ color: "var(--foreground-muted)" }}>
+        <label className="block text-sm font-medium mb-3 text-gray-500 dark:text-gray-400">
           {t("wasteInput.wasteType")}
         </label>
         <div className="grid grid-cols-2 gap-3">
           {wasteCategories.map((category) => {
-            const CatIcon = categoryIconMap[category.id] ?? Grains;
+            const CatIcon = categoryIconMap[category.id] ?? GrainsIcon;
             const isSelected = selectedCategory === category.id;
             return (
               <button
                 key={category.id}
                 type="button"
                 onClick={() => onCategoryChange(category.id)}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all"
-                style={{
-                  borderColor: isSelected ? "var(--brand)" : "var(--border)",
-                  background: isSelected ? "var(--brand-50)" : "var(--surface)",
-                }}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+                  isSelected
+                    ? "border-green-500 bg-green-50 dark:border-green-500 dark:bg-green-900/20"
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                )}
               >
-                <div
-                  className="flex h-12 w-12 items-center justify-center rounded-xl"
-                  style={{
-                    background: isSelected ? "var(--brand-100)" : "var(--brand-50)",
-                    color: "var(--brand)",
-                  }}
+                <CatIcon
+                  weight="duotone"
+                  className={cn(
+                    "h-7 w-7",
+                    isSelected
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-green-600 dark:text-green-500"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "text-sm font-medium text-center",
+                    isSelected
+                      ? "text-green-700 dark:text-green-300"
+                      : "text-gray-700 dark:text-gray-300"
+                  )}
                 >
-                  <CatIcon weight="duotone" className="h-6 w-6" />
-                </div>
-                <span className="text-sm font-medium text-center" style={{ color: "var(--foreground)" }}>
                   {t(category.labelKey)}
                 </span>
-                <span className="text-xs text-center line-clamp-2" style={{ color: "var(--foreground-muted)" }}>
+                <span className="text-xs text-center line-clamp-2 text-gray-500 dark:text-gray-400">
                   {t(category.descKey)}
                 </span>
               </button>
@@ -103,30 +119,42 @@ export function WasteTypeSelector({
       {/* Sub-type Selection */}
       {selectedCategory && subTypes.length > 0 && (
         <div>
-          <label className="block text-sm font-medium mb-3" style={{ color: "var(--foreground-muted)" }}>
+          <label className="block text-sm font-medium mb-3 text-gray-500 dark:text-gray-400">
             {t("wasteInput.wasteSubType")}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {subTypes.map((subType) => {
-              const SubIcon = subTypeIconMap[subType.id] ?? Grains;
+              const SubIcon = subTypeIconMap[subType.id] ?? GrainsIcon;
               const isSelected = selectedSubType === subType.id;
               return (
                 <button
                   key={subType.id}
                   type="button"
                   onClick={() => onSubTypeChange(subType.id)}
-                  className="flex items-center gap-2 p-3 rounded-lg border transition-all text-left"
-                  style={{
-                    borderColor: isSelected ? "var(--brand)" : "var(--border)",
-                    background: isSelected ? "var(--brand-50)" : "var(--surface)",
-                  }}
+                  className={cn(
+                    "flex items-center gap-2 p-3 rounded-lg border transition-all text-left",
+                    isSelected
+                      ? "border-green-500 bg-green-50 dark:border-green-500 dark:bg-green-900/20"
+                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                  )}
                 >
                   <SubIcon
                     weight="duotone"
-                    className="h-5 w-5 shrink-0"
-                    style={{ color: "var(--brand)" }}
+                    className={cn(
+                      "h-5 w-5 shrink-0",
+                      isSelected
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-green-600 dark:text-green-500"
+                    )}
                   />
-                  <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      isSelected
+                        ? "text-green-700 dark:text-green-300"
+                        : "text-gray-700 dark:text-gray-300"
+                    )}
+                  >
                     {t(subType.labelKey)}
                   </span>
                 </button>

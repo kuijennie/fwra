@@ -57,16 +57,11 @@ function TrendIndicator({
 
   if (previous === 0 && current === 0) {
     return (
-      <div
-        className="flex flex-1 items-center gap-2 rounded-lg px-3 py-2"
-        style={{ background: "var(--brand-50)" }}
-      >
-        <Minus weight="duotone" className="h-4 w-4" style={{ color: "var(--foreground-muted)" }} />
+      <div className="flex flex-1 items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700">
+        <Minus weight="duotone" className="h-4 w-4 text-gray-400 dark:text-gray-500" />
         <div>
-          <p className="text-xs font-medium" style={{ color: "var(--foreground-muted)" }}>
-            {label}
-          </p>
-          <p className="text-sm" style={{ color: "var(--foreground-muted)" }}>--</p>
+          <p className="text-xs font-medium text-gray-600 dark:text-gray-300">{label}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">--</p>
         </div>
       </div>
     );
@@ -79,29 +74,21 @@ function TrendIndicator({
   const isUp   = pctChange > 0;
   const isDown = pctChange < 0;
 
-  /* red must be inline — Tailwind red-* is remapped to green in globals.css */
-  const color = isDown ? "#dc2626" : isUp ? "#06402B" : "var(--foreground-muted)";
-  const bg    = isDown ? "rgba(220,38,38,0.08)" : "var(--brand-50)";
-
   return (
     <div
-      className="flex flex-1 items-center gap-2 rounded-lg px-3 py-2"
-      style={{ background: bg }}
+      className={`flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 ${isDown ? "border-red-200 dark:border-red-900/40" : "border-gray-200 dark:border-gray-700"}`}
     >
       {isUp ? (
-        <TrendingUp   weight="duotone" className="h-4 w-4" style={{ color }} />
+        <TrendingUp   weight="duotone" className="h-4 w-4 text-green-600 dark:text-green-400" />
       ) : isDown ? (
-        <TrendingDown weight="duotone" className="h-4 w-4" style={{ color }} />
+        <TrendingDown weight="duotone" className="h-4 w-4 text-red-500" />
       ) : (
-        <Minus        weight="duotone" className="h-4 w-4" style={{ color }} />
+        <Minus        weight="duotone" className="h-4 w-4 text-gray-400 dark:text-gray-500" />
       )}
       <div>
-        <p className="text-xs font-medium" style={{ color: "var(--foreground-muted)" }}>
-          {label}
-        </p>
-        <p className="text-sm font-semibold" style={{ color }}>
-          {isUp ? "+" : ""}
-          {pctChange}% {t("vsLastWeek")}
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-300">{label}</p>
+        <p className={`text-sm font-semibold ${isDown ? "text-red-500" : isUp ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}`}>
+          {isUp ? "+" : ""}{pctChange}% {t("vsLastWeek")}
         </p>
       </div>
     </div>

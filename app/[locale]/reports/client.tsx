@@ -8,17 +8,18 @@ import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks";
 import { Link } from "@/lib/i18n/navigation";
 import {
-  ChartBar as BarChart3,
-  Leaf,
-  Scales as Scale,
-  Lightbulb,
-  CheckCircle as CheckCircle2,
-  ArrowRight,
-  CircleNotch as Loader2,
-  ArrowsCounterClockwise as Recycle,
-  Plant,
-  Fire,
-  Barn,
+  ChartBarIcon as BarChart3,
+  LeafIcon as Leaf,
+  ScalesIcon as Scale,
+  LightbulbIcon as Lightbulb,
+  CheckCircleIcon as CheckCircle2,
+  ArrowRightIcon as ArrowRight,
+  CircleNotchIcon as Loader2,
+  ArrowsCounterClockwiseIcon as Recycle,
+  PlantIcon as Plant,
+  FireIcon as Fire,
+  BarnIcon as Barn,
+  DownloadSimpleIcon as Download,
   type Icon,
 } from "@phosphor-icons/react";
 import { MonthlyActivityChart } from "@/components/reports/monthly-activity-chart";
@@ -63,6 +64,60 @@ const METHOD_ICONS: Record<string, Icon> = {
   animal_feed: Barn,
   vermicompost: Recycle,
 };
+
+function exportToCSV(report: {
+  totalEntries: number;
+  totalVolumeKg: number;
+  totalRecommendations: number;
+  totalAdopted: number;
+  wasteTypeBreakdown: { type: string; count: number; volumeKg: number }[];
+  methodBreakdown: { method: string; recommended: number; adopted: number }[];
+  topSubTypes: { subType: string; count: number }[];
+}) {
+  const rows: string[] = [];
+
+  // Summary
+  rows.push("SUMMARY");
+  rows.push("Metric,Value");
+  rows.push(`Total Waste Entries,${report.totalEntries}`);
+  rows.push(`Total Volume (kg),${report.totalVolumeKg}`);
+  rows.push(`Recommendations Generated,${report.totalRecommendations}`);
+  rows.push(`Methods Adopted,${report.totalAdopted}`);
+
+  // Waste type breakdown
+  rows.push("");
+  rows.push("WASTE TYPE BREAKDOWN");
+  rows.push("Type,Entries,Volume (kg)");
+  for (const item of report.wasteTypeBreakdown) {
+    rows.push(`${item.type.replace(/_/g, " ")},${item.count},${Math.round(item.volumeKg)}`);
+  }
+
+  // Method breakdown
+  rows.push("");
+  rows.push("RECYCLING METHODS");
+  rows.push("Method,Recommended,Adopted");
+  for (const item of report.methodBreakdown) {
+    rows.push(`${item.method.replace(/_/g, " ")},${item.recommended},${item.adopted}`);
+  }
+
+  // Top sub-types
+  rows.push("");
+  rows.push("TOP WASTE SUB-TYPES");
+  rows.push("Sub-Type,Count");
+  for (const item of report.topSubTypes) {
+    rows.push(`${item.subType.replace(/_/g, " ")},${item.count}`);
+  }
+
+  // Trigger download
+  const csv = rows.join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `fwra-report-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 export function ReportsPageClient() {
   const t = useTranslations();
@@ -112,13 +167,22 @@ export function ReportsPageClient() {
       ) : (
         <main className="min-h-screen bg-gray-50 px-4 py-8 dark:bg-gray-900">
           <div className="mx-auto max-w-4xl">
-            <div className="mb-8">
-              <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-                {t("reports.title")}
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                {t("reports.subtitle")}
-              </p>
+            <div className="mb-8 flex items-start justify-between gap-4">
+              <div>
+                <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+                  {t("reports.title")}
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {t("reports.subtitle")}
+                </p>
+              </div>
+              <button
+                onClick={() => exportToCSV(report)}
+                className="flex shrink-0 items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 transition-colors hover:bg-green-100 dark:border-green-800 dark:bg-green-950/40 dark:text-green-400 dark:hover:bg-green-900/40"
+              >
+                <Download weight="duotone" className="h-4 w-4" />
+                Export CSV
+              </button>
             </div>
 
             <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -157,7 +221,7 @@ export function ReportsPageClient() {
                   {report.wasteTypeBreakdown.map((item) => {
                     const colors = WASTE_TYPE_COLORS[item.type] || {
                       bar: "bg-gray-500",
-                      label: item.type,
+                      label: item.type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
                     };
                     const maxWasteCount = Math.max(...report.wasteTypeBreakdown.map((w) => w.count), 1);
                     const pct = (item.count / maxWasteCount) * 100;
@@ -194,30 +258,24 @@ export function ReportsPageClient() {
                     return (
                       <div
                         key={item.method}
-                        className="flex items-center justify-between rounded-xl px-4 py-3"
-                        style={{ background: "var(--brand-50)" }}
+                        className="flex items-center justify-between rounded-xl px-4 py-3 border border-gray-100 dark:border-gray-700"
                       >
                         <div className="flex items-center gap-3">
-                          <div
-                            className="flex h-8 w-8 items-center justify-center rounded-lg"
-                            style={{ background: "var(--brand-100)", color: "var(--brand)" }}
-                          >
-                            <MethodIcon weight="duotone" className="h-4 w-4" />
-                          </div>
+                          <MethodIcon weight="duotone" className="h-5 w-5" style={{ color: "var(--brand)" }} />
                           <span className="font-medium capitalize" style={{ color: "var(--foreground)" }}>
                             {item.method.replace("_", " ")}
                           </span>
                         </div>
                         <div className="flex items-center gap-4 text-sm">
                           <div className="text-center">
-                            <div className="font-bold" style={{ color: "var(--brand)" }}>{item.recommended}</div>
-                            <div className="text-xs" style={{ color: "var(--foreground-muted)" }}>
+                            <div className="font-bold text-gray-900 dark:text-white">{item.recommended}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {t("reports.recommended")}
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="font-bold" style={{ color: "var(--brand)" }}>{item.adopted}</div>
-                            <div className="text-xs" style={{ color: "var(--foreground-muted)" }}>
+                            <div className="font-bold text-gray-900 dark:text-white">{item.adopted}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {t("reports.adopted")}
                             </div>
                           </div>
@@ -281,15 +339,15 @@ function SummaryCard({
   color: "green" | "blue" | "amber" | "purple";
 }) {
   const colorClasses = {
-    green: "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400",
-    blue: "bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400",
-    amber: "bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400",
-    purple: "bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400",
+    green: "text-green-600 dark:text-green-400",
+    blue: "text-blue-600 dark:text-blue-400",
+    amber: "text-amber-600 dark:text-amber-400",
+    purple: "text-purple-600 dark:text-purple-400",
   };
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-      <div className={`mb-2 inline-flex rounded-lg p-2 ${colorClasses[color]}`}>
+      <div className={`mb-2 ${colorClasses[color]}`}>
         {icon}
       </div>
       <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>

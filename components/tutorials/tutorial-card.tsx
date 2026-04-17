@@ -4,8 +4,15 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Badge } from "@/components/ui";
 import {
-  Clock, BookOpen, Eye,
-  Plant, Fire, Leaf, Barn, ArrowsCounterClockwise, SquaresFour,
+  ClockIcon,
+  BookOpenIcon,
+  EyeIcon,
+  PlantIcon,
+  FireIcon,
+  LeafIcon,
+  BarnIcon,
+  ArrowsCounterClockwiseIcon,
+  SquaresFourIcon,
   type Icon,
 } from "@phosphor-icons/react";
 
@@ -22,11 +29,11 @@ interface TutorialCardProps {
 }
 
 const categoryIcons: Record<string, Icon> = {
-  composting:   Plant,
-  biogas:       Fire,
-  mulching:     Leaf,
-  animal_feed:  Barn,
-  vermicompost: ArrowsCounterClockwise,
+  composting:   PlantIcon,
+  biogas:       FireIcon,
+  mulching:     LeafIcon,
+  animal_feed:  BarnIcon,
+  vermicompost: ArrowsCounterClockwiseIcon,
 };
 
 export function TutorialCard({
@@ -52,19 +59,15 @@ export function TutorialCard({
     advanced: "danger",
   } as const;
 
-  const CategoryIcon = categoryIcons[category] ?? SquaresFour;
+  const CategoryIcon = categoryIcons[category] ?? SquaresFourIcon;
 
   return (
     <Link
       href={`/tutorials/${category}/${slug}`}
-      className="group block rounded-xl overflow-hidden transition-all hover:shadow-lg"
-      style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      className="group block rounded-xl overflow-hidden border transition-all hover:shadow-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
     >
       {/* Thumbnail */}
-      <div
-        className="relative h-32"
-        style={{ background: "var(--brand-50)" }}
-      >
+      <div className="relative h-32">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -73,16 +76,15 @@ export function TutorialCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <CategoryIcon weight="duotone" className="h-14 w-14" style={{ color: "var(--brand-300)" }} />
+            <CategoryIcon
+              weight="duotone"
+              className="h-8 w-8 text-green-400 dark:text-green-500"
+            />
           </div>
         )}
-        {/* Category Badge */}
+        {/* Category badge */}
         <div className="absolute top-3 left-3">
-          <span
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
-            style={{ background: "var(--brand-100)", color: "var(--brand)" }}
-          >
-            <CategoryIcon weight="duotone" className="h-3 w-3" />
+          <span className="text-xs font-medium text-green-700 dark:text-green-300">
             {t(`tutorials.${category}`)}
           </span>
         </div>
@@ -90,14 +92,11 @@ export function TutorialCard({
 
       {/* Content */}
       <div className="p-4">
-        <h3
-          className="font-semibold mb-2 line-clamp-2 transition-colors group-hover:opacity-80"
-          style={{ color: "var(--foreground)" }}
-        >
+        <h3 className="font-semibold mb-2 line-clamp-2 transition-colors text-gray-900 dark:text-white group-hover:opacity-80">
           {localizedTitle}
         </h3>
 
-        <p className="text-sm mb-3 line-clamp-2" style={{ color: "var(--foreground-muted)" }}>
+        <p className="text-sm mb-3 line-clamp-2 text-gray-500 dark:text-gray-400">
           {localizedDescription}
         </p>
 
@@ -110,18 +109,18 @@ export function TutorialCard({
             {t(`recommendations.${difficulty}`)}
           </Badge>
 
-          <span className="flex items-center gap-1 text-xs" style={{ color: "var(--foreground-muted)" }}>
-            <Clock weight="duotone" className="h-3 w-3" />
+          <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <ClockIcon weight="duotone" className="h-3 w-3" />
             {duration}
           </span>
 
-          <span className="flex items-center gap-1 text-xs" style={{ color: "var(--foreground-muted)" }}>
-            <BookOpen weight="duotone" className="h-3 w-3" />
+          <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <BookOpenIcon weight="duotone" className="h-3 w-3" />
             {stepsCount} {t("tutorials.steps")}
           </span>
 
-          <span className="flex items-center gap-1 text-xs ml-auto" style={{ color: "var(--foreground-muted)" }}>
-            <Eye weight="duotone" className="h-3 w-3" />
+          <span className="flex items-center gap-1 text-xs ml-auto text-gray-500 dark:text-gray-400">
+            <EyeIcon weight="duotone" className="h-3 w-3" />
             {viewCount}
           </span>
         </div>

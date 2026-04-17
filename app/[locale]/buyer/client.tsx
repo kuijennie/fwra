@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from "@phosphor-icons/react";
 
+
 const PRODUCT_TYPES = [
   "compost",
   "biogas_slurry",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { Card, Badge } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { MapPin, Quotes as Quote } from "@phosphor-icons/react";
 import type { Doc } from "@/convex/_generated/dataModel";
 

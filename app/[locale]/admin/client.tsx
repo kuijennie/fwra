@@ -6,25 +6,24 @@ import { useUser } from "@clerk/nextjs";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
-  Users,
-  Plant as Sprout,
-  ShoppingBag,
-  Shield,
-  Globe,
-  FileText,
-  Lightbulb,
-  Bell,
-  CircleNotch as Loader2,
-  ShieldWarning as ShieldAlert,
-  MagnifyingGlass as Search,
-  BookOpen,
-  Star,
-  PaperPlaneTilt,
-  Plus,
-  Trash,
-  CheckCircle,
-  X,
-  PencilSimple,
+  UsersIcon as Users,
+  PlantIcon as Sprout,
+  ShoppingBagIcon as ShoppingBag,
+  ShieldIcon as Shield,
+  GlobeIcon as Globe,
+  FileTextIcon as FileText,
+  LightbulbIcon as Lightbulb,
+  BellIcon as Bell,
+  CircleNotchIcon as Loader2,
+  ShieldWarningIcon as ShieldAlert,
+  MagnifyingGlassIcon as Search,
+  BookOpenIcon as BookOpen,
+  StarIcon as Star,
+  PaperPlaneTiltIcon as PaperPlaneTilt,
+  PlusIcon as Plus,
+  TrashIcon as Trash,
+  CheckCircleIcon as CheckCircle,
+  PencilSimpleIcon as PencilSimple,
 } from "@phosphor-icons/react";
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -76,6 +75,7 @@ export function AdminDashboardClient() {
   const [editingTutorialId, setEditingTutorialId] = useState<Id<"tutorials"> | null>(null);
   const [tutorialForm, setTutorialForm] = useState(emptyTutorialForm());
   const [savingTutorial, setSavingTutorial] = useState(false);
+  const [tutorialError, setTutorialError] = useState<string | null>(null);
 
   // Story form state
   const [showCreateStory, setShowCreateStory] = useState(false);
@@ -178,10 +178,15 @@ export function AdminDashboardClient() {
     setShowCreateTutorial(false);
     setEditingTutorialId(null);
     setTutorialForm(emptyTutorialForm());
+    setTutorialError(null);
   };
 
   const handleSaveTutorial = async () => {
-    if (!tutorialForm.titleEn || !tutorialForm.titleSw || !tutorialForm.duration) return;
+    setTutorialError(null);
+    if (!tutorialForm.titleEn || !tutorialForm.titleSw || !tutorialForm.duration) {
+      setTutorialError("Title (English), Title (Swahili), and Duration are required.");
+      return;
+    }
     setSavingTutorial(true);
     try {
       const payload = {
@@ -206,6 +211,8 @@ export function AdminDashboardClient() {
         await createTutorial({ slug, ...payload });
       }
       closeTutorialForm();
+    } catch (err) {
+      setTutorialError(err instanceof Error ? err.message : "Failed to save tutorial. Please try again.");
     } finally {
       setSavingTutorial(false);
     }
@@ -546,6 +553,12 @@ export function AdminDashboardClient() {
                         {t("admin.addStep")}
                       </button>
                     </div>
+
+                    {tutorialError && (
+                      <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-400">
+                        {tutorialError}
+                      </p>
+                    )}
 
                     <div className="flex gap-3 pt-2">
                       <button onClick={handleSaveTutorial} disabled={savingTutorial} className="rounded-lg px-5 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: B, color: "#fff" }}>

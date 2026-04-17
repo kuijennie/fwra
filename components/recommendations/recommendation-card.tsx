@@ -60,11 +60,11 @@ export function RecommendationCard({
   const color = methodColors[recommendation.method as keyof typeof methodColors] || "green";
 
   const colorClasses = {
-    green: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
-    orange: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
-    amber: "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
-    purple: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
-    red: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+    green: "text-green-600 dark:text-green-400",
+    orange: "text-orange-500 dark:text-orange-400",
+    amber: "text-amber-500 dark:text-amber-400",
+    purple: "text-purple-600 dark:text-purple-400",
+    red: "text-red-500 dark:text-red-400",
   };
 
   const reasoning =
@@ -94,9 +94,7 @@ export function RecommendationCard({
 
       <div className="flex gap-4">
         {/* Icon */}
-        <div className={cn("rounded-xl p-3 h-fit", colorClasses[color])}>
-          <Icon weight="duotone" className="h-6 w-6" />
-        </div>
+        <Icon weight="duotone" className={cn("h-6 w-6 shrink-0 mt-0.5", colorClasses[color])} />
 
         {/* Content */}
         <div className="flex-1 min-w-0">

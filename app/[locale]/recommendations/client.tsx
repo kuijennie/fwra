@@ -68,7 +68,7 @@ export function RecommendationsPageClient() {
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center min-h-[300px]">
+            <div className="flex items-center justify-center min-h-75">
               <Loader2 weight="duotone" className="h-8 w-8 animate-spin text-green-600" />
             </div>
           ) : (

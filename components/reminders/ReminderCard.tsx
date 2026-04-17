@@ -77,12 +77,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
     <Card className={`p-4 ${isOverdue ? "border-red-300 dark:border-red-800" : ""}`}>
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-          style={{ background: "var(--brand-100)", color: "var(--brand)" }}
-        >
-          {(() => { const TaskIcon = taskTypeIcons[reminder.taskType] ?? FileText; return <TaskIcon weight="duotone" className="h-5 w-5" />; })()}
-        </div>
+        {(() => { const TaskIcon = taskTypeIcons[reminder.taskType] ?? FileText; return <TaskIcon weight="duotone" className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--brand)" }} />; })()}
 
         {/* Content */}
         <div className="flex-1 min-w-0">

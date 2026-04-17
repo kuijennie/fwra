@@ -5,13 +5,14 @@ import { useQuery } from "convex/react";
 import { Link } from "@/lib/i18n/navigation";
 import { api } from "@/convex/_generated/api";
 import {
-  Leaf,
-  Lightbulb,
-  BookOpen,
-  ArrowRight,
-  Plant as Sprout,
-  Drop as Droplets,
-  Fire as Flame,
+  LeafIcon,
+  LightbulbIcon,
+  BookOpenIcon,
+  ArrowRightIcon,
+  PlantIcon,
+  DropIcon,
+  FireIcon,
+  ScalesIcon,
 } from "@phosphor-icons/react";
 
 export function HomeContent() {
@@ -28,191 +29,158 @@ export function HomeContent() {
         : t("home.subtitle");
 
   return (
-    <main className="min-h-screen" style={{ background: "var(--background)" }}>
-      <section className="px-4 pb-10 pt-14 text-center">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+
+      {/* Hero */}
+      <section className="px-4 pb-12 pt-16 text-center">
         <div className="mx-auto max-w-2xl">
           <div className="mb-5 flex justify-center">
-            <div
-              className="flex h-16 w-16 items-center justify-center rounded-2xl"
-              style={{ background: "#06402B" }}
-            >
-              <Sprout weight="duotone" className="h-8 w-8 text-white" />
-            </div>
+            <PlantIcon weight="duotone" className="h-12 w-12 text-green-600 dark:text-green-400" />
           </div>
-          <h1
-            className="font-display mb-4 text-4xl font-bold italic leading-tight sm:text-5xl"
-            style={{ color: "var(--foreground)" }}
-          >
+          <h1 className="font-display mb-4 text-4xl font-bold italic leading-tight text-gray-900 dark:text-white sm:text-5xl">
             {t("home.welcome")}
           </h1>
-          <p className="mb-8 text-lg leading-relaxed" style={{ color: "var(--foreground-muted)" }}>
+          <p className="mb-8 text-lg leading-relaxed text-gray-500 dark:text-gray-400">
             {roleSubtitle}
           </p>
           <Link
             href={primaryHref}
-            className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: "#06402B" }}
+            className="inline-flex items-center gap-2 rounded-full bg-green-700 px-7 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90 dark:bg-green-600"
           >
             {t(getPrimaryCtaKey(role))}
-            <ArrowRight weight="duotone" className="h-4 w-4" />
+            <ArrowRightIcon weight="duotone" className="h-4 w-4" />
           </Link>
         </div>
       </section>
 
+      {/* Quick Actions */}
       <section className="px-4 py-10">
         <div className="mx-auto max-w-4xl">
-          <h2
-            className="mb-6 text-xs font-semibold uppercase tracking-widest"
-            style={{ color: "#5a9e7c" }}
-          >
+          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-green-700 dark:text-green-500">
             {t("home.quickActions")}
-          </h2>
+          </p>
           <div className="grid gap-4 sm:grid-cols-3">
             {quickActions.map((action) => (
-              <QuickActionCard
+              <Link
                 key={action.href}
                 href={action.href}
-                icon={action.icon}
-                title={t(action.titleKey)}
-                description={t(action.descriptionKey)}
-              />
+                className="group flex flex-col rounded-xl border border-gray-200 bg-white p-6 text-center transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+              >
+                <div className="mx-auto mb-4 text-green-600 dark:text-green-400 transition-opacity group-hover:opacity-80">
+                  {action.icon}
+                </div>
+                <h3 className="mb-1.5 font-semibold text-gray-900 dark:text-white">
+                  {t(action.titleKey)}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                  {t(action.descriptionKey)}
+                </p>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-10" style={{ background: "var(--surface)" }}>
+      {/* Categories */}
+      <section className="px-4 py-10">
         <div className="mx-auto max-w-4xl">
-          <h2
-            className="mb-6 text-xs font-semibold uppercase tracking-widest"
-            style={{ color: "#5a9e7c" }}
-          >
+          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-green-700 dark:text-green-500">
             {t("tutorials.categories")}
-          </h2>
+          </p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <MethodCard icon={<Leaf weight="duotone" className="h-7 w-7" />} title={t("recommendations.composting")} />
-            <MethodCard icon={<Flame weight="duotone" className="h-7 w-7" />} title={t("recommendations.biogas")} />
-            <MethodCard icon={<Droplets weight="duotone" className="h-7 w-7" />} title={t("recommendations.mulching")} />
-            <MethodCard icon={<Sprout weight="duotone" className="h-7 w-7" />} title={t("recommendations.animalFeed")} />
+            {[
+              { icon: <LeafIcon weight="duotone" className="h-7 w-7" />, label: t("recommendations.composting") },
+              { icon: <FireIcon weight="duotone" className="h-7 w-7" />, label: t("recommendations.biogas") },
+              { icon: <DropIcon weight="duotone" className="h-7 w-7" />, label: t("recommendations.mulching") },
+              { icon: <PlantIcon weight="duotone" className="h-7 w-7" />, label: t("recommendations.animalFeed") },
+            ].map(({ icon, label }) => (
+              <div
+                key={label}
+                className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-5 text-center dark:border-gray-700 dark:bg-gray-800"
+              >
+                <div className="mb-3 text-green-600 dark:text-green-400">{icon}</div>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-14">
+      {/* Legal */}
+      <section className="px-4 py-10">
         <div className="mx-auto max-w-4xl">
-          <div
-            className="overflow-hidden rounded-2xl p-10 text-white"
-            style={{ background: "#06402B" }}
+          <p className="mb-6 text-xs font-semibold uppercase tracking-widest text-green-700 dark:text-green-500">
+            {t("legal.title")}
+          </p>
+          <Link
+            href="/legal"
+            className="group flex items-center gap-6 rounded-xl border border-gray-200 bg-white p-6 transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
           >
+            <ScalesIcon weight="duotone" className="h-7 w-7 shrink-0 text-green-600 dark:text-green-400" />
+            <div className="flex-1 min-w-0">
+              <h3 className="mb-1 font-semibold text-gray-900 dark:text-white">
+                {t("legal.wasteManagementAct")}
+              </h3>
+              <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                {t("legal.subtitle")}
+              </p>
+            </div>
+            <ArrowRightIcon
+              weight="duotone"
+              className="h-5 w-5 shrink-0 text-green-600 transition-transform group-hover:translate-x-1 dark:text-green-400"
+            />
+          </Link>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="px-4 py-10">
+        <div className="mx-auto max-w-4xl">
+          <div className="overflow-hidden rounded-xl bg-green-700 p-10 text-white dark:bg-green-800">
             <h2 className="font-display mb-2 text-center text-2xl font-bold italic">
               Why Recycle Farm Waste?
             </h2>
-            <p className="mb-8 text-center text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
+            <p className="mb-8 text-center text-sm text-white/65">
               The numbers that drive our mission
             </p>
             <div className="grid gap-8 sm:grid-cols-3">
-              <StatItem value="3,000-4,000" label="tons of waste daily in Kenya" />
-              <StatItem value="80%" label="of Nairobi waste is organic" />
-              <StatItem value="30-40%" label="of food is lost or wasted" />
+              <div className="text-center">
+                <div className="font-display mb-1 text-3xl font-bold italic">3,000–4,000</div>
+                <div className="text-sm text-white/65">tons of waste daily in Kenya</div>
+              </div>
+              <div className="text-center">
+                <div className="font-display mb-1 text-3xl font-bold italic">80%</div>
+                <div className="text-sm text-white/65">of Nairobi waste is organic</div>
+              </div>
+              <div className="text-center">
+                <div className="font-display mb-1 text-3xl font-bold italic">30–40%</div>
+                <div className="text-sm text-white/65">of food is lost or wasted</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Bottom CTA */}
       <section className="px-4 pb-16 pt-4 text-center">
         <div className="mx-auto max-w-xl">
-          <h2
-            className="font-display mb-3 text-2xl font-bold italic"
-            style={{ color: "var(--foreground)" }}
-          >
+          <h2 className="font-display mb-3 text-2xl font-bold italic text-gray-900 dark:text-white">
             Ready to turn waste into value?
           </h2>
-          <p className="mb-7 text-sm leading-relaxed" style={{ color: "var(--foreground-muted)" }}>
+          <p className="mb-7 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
             Start with the next action that fits your role.
           </p>
           <Link
             href={primaryHref}
-            className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: "#06402B" }}
+            className="inline-flex items-center gap-2 rounded-full bg-green-700 px-8 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-90 dark:bg-green-600"
           >
             {t(getPrimaryCtaKey(role))}
-            <ArrowRight weight="duotone" className="h-4 w-4" />
+            <ArrowRightIcon weight="duotone" className="h-4 w-4" />
           </Link>
         </div>
       </section>
+
     </main>
-  );
-}
-
-function QuickActionCard({
-  href,
-  icon,
-  title,
-  description,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex flex-col rounded-xl border p-6 text-center transition-shadow hover:shadow-md"
-      style={{
-        background: "var(--surface)",
-        borderColor: "var(--border)",
-      }}
-    >
-      <div
-        className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-xl transition-colors group-hover:opacity-90"
-        style={{ background: "var(--brand-100)", color: "var(--brand)" }}
-      >
-        {icon}
-      </div>
-      <h3 className="mb-1.5 font-semibold" style={{ color: "var(--foreground)" }}>
-        {title}
-      </h3>
-      <p className="text-sm leading-relaxed" style={{ color: "var(--foreground-muted)" }}>
-        {description}
-      </p>
-    </Link>
-  );
-}
-
-function MethodCard({
-  icon,
-  title,
-}: {
-  icon: React.ReactNode;
-  title: string;
-}) {
-  return (
-    <div
-      className="flex flex-col items-center rounded-xl border p-5 text-center"
-      style={{ background: "var(--brand-50)", borderColor: "var(--border)" }}
-    >
-      <div
-        className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl"
-        style={{ background: "var(--brand-100)", color: "var(--brand)" }}
-      >
-        {icon}
-      </div>
-      <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
-        {title}
-      </span>
-    </div>
-  );
-}
-
-function StatItem({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="text-center">
-      <div className="font-display mb-1 text-3xl font-bold italic">{value}</div>
-      <div className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
-        {label}
-      </div>
-    </div>
   );
 }
 
@@ -226,91 +194,28 @@ function getPrimaryCtaKey(role: string | null | undefined) {
 function getHomeQuickActions(role: string | null | undefined) {
   if (role === "admin") {
     return [
-      {
-        href: "/admin",
-        icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
-        titleKey: "roles.admin",
-        descriptionKey: "admin.subtitle",
-      },
-      {
-        href: "/marketplace",
-        icon: <Leaf weight="duotone" className="h-5 w-5" />,
-        titleKey: "nav.marketplace",
-        descriptionKey: "marketplace.subtitle",
-      },
-      {
-        href: "/tutorials",
-        icon: <BookOpen weight="duotone" className="h-5 w-5" />,
-        titleKey: "nav.tutorials",
-        descriptionKey: "tutorials.subtitle",
-      },
+      { href: "/admin",       icon: <LightbulbIcon weight="duotone" className="h-5 w-5" />, titleKey: "roles.admin",           descriptionKey: "admin.subtitle" },
+      { href: "/marketplace", icon: <LeafIcon      weight="duotone" className="h-5 w-5" />, titleKey: "nav.marketplace",       descriptionKey: "marketplace.subtitle" },
+      { href: "/tutorials",   icon: <BookOpenIcon  weight="duotone" className="h-5 w-5" />, titleKey: "nav.tutorials",         descriptionKey: "tutorials.subtitle" },
     ];
   }
-
   if (role === "buyer") {
     return [
-      {
-        href: "/marketplace",
-        icon: <Leaf weight="duotone" className="h-5 w-5" />,
-        titleKey: "nav.marketplace",
-        descriptionKey: "marketplace.subtitle",
-      },
-      {
-        href: "/tutorials",
-        icon: <BookOpen weight="duotone" className="h-5 w-5" />,
-        titleKey: "home.browseTutorials",
-        descriptionKey: "home.browseTutorialsDesc",
-      },
-      {
-        href: "/profile",
-        icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
-        titleKey: "nav.profile",
-        descriptionKey: "profile.subtitle",
-      },
+      { href: "/marketplace", icon: <LeafIcon      weight="duotone" className="h-5 w-5" />, titleKey: "nav.marketplace",       descriptionKey: "marketplace.subtitle" },
+      { href: "/tutorials",   icon: <BookOpenIcon  weight="duotone" className="h-5 w-5" />, titleKey: "home.browseTutorials",  descriptionKey: "home.browseTutorialsDesc" },
+      { href: "/profile",     icon: <LightbulbIcon weight="duotone" className="h-5 w-5" />, titleKey: "nav.profile",           descriptionKey: "profile.subtitle" },
     ];
   }
-
   if (role === "farmer") {
     return [
-      {
-        href: "/farmer",
-        icon: <Sprout weight="duotone" className="h-5 w-5" />,
-        titleKey: "nav.farmer",
-        descriptionKey: "farmerDashboard.subtitle",
-      },
-      {
-        href: "/waste-input",
-        icon: <Leaf weight="duotone" className="h-5 w-5" />,
-        titleKey: "home.logWasteAction",
-        descriptionKey: "home.logWasteDesc",
-      },
-      {
-        href: "/recommendations",
-        icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
-        titleKey: "home.getRecommendations",
-        descriptionKey: "home.getRecommendationsDesc",
-      },
+      { href: "/farmer",          icon: <PlantIcon     weight="duotone" className="h-5 w-5" />, titleKey: "nav.farmer",            descriptionKey: "farmerDashboard.subtitle" },
+      { href: "/waste-input",     icon: <LeafIcon      weight="duotone" className="h-5 w-5" />, titleKey: "home.logWasteAction",   descriptionKey: "home.logWasteDesc" },
+      { href: "/recommendations", icon: <LightbulbIcon weight="duotone" className="h-5 w-5" />, titleKey: "home.getRecommendations", descriptionKey: "home.getRecommendationsDesc" },
     ];
   }
-
   return [
-    {
-      href: "/waste-input",
-      icon: <Leaf weight="duotone" className="h-5 w-5" />,
-      titleKey: "home.logWasteAction",
-      descriptionKey: "home.logWasteDesc",
-    },
-    {
-      href: "/recommendations",
-      icon: <Lightbulb weight="duotone" className="h-5 w-5" />,
-      titleKey: "home.getRecommendations",
-      descriptionKey: "home.getRecommendationsDesc",
-    },
-    {
-      href: "/tutorials",
-      icon: <BookOpen weight="duotone" className="h-5 w-5" />,
-      titleKey: "home.browseTutorials",
-      descriptionKey: "home.browseTutorialsDesc",
-    },
+    { href: "/waste-input",     icon: <LeafIcon      weight="duotone" className="h-5 w-5" />, titleKey: "home.logWasteAction",   descriptionKey: "home.logWasteDesc" },
+    { href: "/recommendations", icon: <LightbulbIcon weight="duotone" className="h-5 w-5" />, titleKey: "home.getRecommendations", descriptionKey: "home.getRecommendationsDesc" },
+    { href: "/tutorials",       icon: <BookOpenIcon  weight="duotone" className="h-5 w-5" />, titleKey: "home.browseTutorials",  descriptionKey: "home.browseTutorialsDesc" },
   ];
 }

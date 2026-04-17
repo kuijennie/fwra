@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChatCircle as MessageCircle, X, PaperPlaneTilt as Send, CircleNotch as Loader2, Sparkle as Sparkles } from "@phosphor-icons/react";
+import { ChatCircleIcon as MessageCircle, XIcon as X, PaperPlaneTiltIcon as Send, CircleNotchIcon as Loader2, SparkleIcon as Sparkles } from "@phosphor-icons/react";
 import ReactMarkdown from "react-markdown";
 
+// A single chat message — either from the user or the AI assistant
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+// These appear as clickable suggestion buttons when the chat is empty
 const SUGGESTED_QUESTIONS = [
   "How do I start composting at home?",
   "What waste is good for biogas?",
@@ -17,14 +19,19 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 export function ChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);          // is the chat panel open or closed?
+  const [messages, setMessages] = useState<Message[]>([]); // full conversation history
+  const [input, setInput] = useState("");                // what the user is currently typing
+  const [isLoading, setIsLoading] = useState(false);    // true while waiting for AI to respond
+
+  // Used to auto-scroll to the latest message
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Used to auto-focus the text input when the chat opens
   const inputRef = useRef<HTMLInputElement>(null);
+  // Reference to the chat panel div (not currently used but kept for future use)
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to the bottom of the message list every time a new message arrives
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -33,13 +40,14 @@ export function ChatWidget() {
     scrollToBottom();
   }, [messages]);
 
+  // When the chat opens, move the cursor into the text input automatically
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
     }
   }, [isOpen]);
 
-  // Close on Escape
+  // Allow the user to close the chat by pressing the Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
@@ -50,17 +58,20 @@ export function ChatWidget() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
+  // Called when the user sends a message (either by typing or clicking a suggestion)
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!content.trim() || isLoading) return;
+      if (!content.trim() || isLoading) return; // ignore empty messages or double-sends
 
       const userMessage: Message = { role: "user", content: content.trim() };
       const newMessages = [...messages, userMessage];
-      setMessages(newMessages);
-      setInput("");
+      setMessages(newMessages); // show the user's message immediately
+      setInput("");             // clear the input box
       setIsLoading(true);
 
       try {
+        // Send the full conversation history to the API route
+        // The server adds the system prompt and calls OpenAI
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -71,17 +82,23 @@ export function ChatWidget() {
           throw new Error("Failed to get response");
         }
 
+        // The API streams back plain text chunks — we read them one by one
         const reader = response.body!.getReader();
         const decoder = new TextDecoder();
         let assistantContent = "";
 
+        // Add an empty assistant message placeholder — we'll fill it in as chunks arrive
         setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
+          // Decode the chunk and append it to what we have so far
           assistantContent += decoder.decode(value, { stream: true });
+
+          // Update the last message (the assistant's) with the growing content
+          // This creates the "typing" streaming effect
           setMessages((prev) => {
             const updated = [...prev];
             updated[updated.length - 1] = {
@@ -92,6 +109,7 @@ export function ChatWidget() {
           });
         }
       } catch {
+        // If anything goes wrong, show a friendly error message in the chat
         setMessages((prev) => [
           ...prev,
           {
@@ -107,6 +125,7 @@ export function ChatWidget() {
     [messages, isLoading]
   );
 
+  // Called when the user submits the form (presses Enter or clicks the send button)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage(input);
@@ -114,7 +133,7 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating green bubble button — shown when the chat is closed */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -125,23 +144,24 @@ export function ChatWidget() {
         </button>
       )}
 
-      {/* Chat Panel */}
+      {/* Chat Panel — shown when the chat is open */}
       {isOpen && (
         <>
-          {/* Backdrop on mobile */}
+          {/* Dark overlay behind the panel on mobile — tapping it closes the chat */}
           <div
             className="fixed inset-0 z-50 bg-black/30 md:hidden"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
 
+          {/* The main chat panel */}
           <div
             ref={panelRef}
             role="dialog"
             aria-label="Recycling assistant chat"
-            className="fixed bottom-0 right-0 z-50 flex h-[85vh] w-full flex-col rounded-t-2xl bg-white shadow-2xl dark:bg-gray-900 md:bottom-6 md:right-4 md:h-[600px] md:w-[400px] md:rounded-2xl"
+            className="fixed bottom-0 right-0 z-50 flex h-[85vh] w-full flex-col rounded-t-2xl bg-white shadow-2xl dark:bg-gray-900 md:bottom-6 md:right-4 md:h-150 md:w-100 md:rounded-2xl"
           >
-            {/* Header */}
+            {/* Header bar — shows the assistant name and close button */}
             <div className="flex items-center justify-between rounded-t-2xl border-b border-gray-200 bg-green-600 px-4 py-3 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <Sparkles weight="duotone" className="h-5 w-5 text-green-100" />
@@ -158,9 +178,10 @@ export function ChatWidget() {
               </button>
             </div>
 
-            {/* Messages Area */}
+            {/* Messages Area — scrollable */}
             <div className="flex-1 overflow-y-auto px-4 py-4">
               {messages.length === 0 ? (
+                // Empty state — shown before the user sends any message
                 <div className="flex h-full flex-col items-center justify-center">
                   <div className="mb-4 rounded-full bg-green-100 p-4 dark:bg-green-900">
                     <Sparkles weight="duotone" className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -171,7 +192,8 @@ export function ChatWidget() {
                   <p className="mb-6 text-center text-sm text-gray-500 dark:text-gray-400">
                     farm waste recycling & composting
                   </p>
-                  <div className="flex flex-col gap-2 w-full max-w-[280px]">
+                  {/* Clickable suggestion chips — clicking sends the question immediately */}
+                  <div className="flex flex-col gap-2 w-full max-w-70">
                     {SUGGESTED_QUESTIONS.map((question) => (
                       <button
                         key={question}
@@ -184,31 +206,37 @@ export function ChatWidget() {
                   </div>
                 </div>
               ) : (
+                // Conversation view — renders all messages in order
                 <div className="space-y-4">
                   {messages.map((message, index) => (
                     <div
                       key={index}
+                      // User messages align right, assistant messages align left
                       className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                           message.role === "user"
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                            ? "bg-green-600 text-white"          // green bubble for user
+                            : "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100" // gray for AI
                         }`}
                       >
                         {message.role === "assistant" ? (
+                          // Render AI responses as Markdown (supports bold, lists, etc.)
                           <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:mb-2 [&>ol]:mb-2">
                             <ReactMarkdown>
                               {message.content || "..."}
                             </ReactMarkdown>
                           </div>
                         ) : (
+                          // User messages are plain text
                           message.content
                         )}
                       </div>
                     </div>
                   ))}
+
+                  {/* Spinning "Thinking..." indicator shown while the AI is responding */}
                   {isLoading && messages[messages.length - 1]?.role === "user" && (
                     <div className="flex justify-start">
                       <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-4 py-2.5 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
@@ -217,12 +245,14 @@ export function ChatWidget() {
                       </div>
                     </div>
                   )}
+
+                  {/* Invisible div at the bottom — scrolled into view on new messages */}
                   <div ref={messagesEndRef} />
                 </div>
               )}
             </div>
 
-            {/* Input Area */}
+            {/* Input Area — text box + send button */}
             <form
               onSubmit={handleSubmit}
               className="border-t border-gray-200 px-4 py-3 dark:border-gray-700"
@@ -234,10 +264,11 @@ export function ChatWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about recycling..."
-                  disabled={isLoading}
+                  disabled={isLoading} // lock the input while the AI is responding
                   className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-500 outline-none transition-colors focus:border-green-500 focus:ring-2 focus:ring-green-500/20 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-green-500"
                   aria-label="Type your message"
                 />
+                {/* Send button — disabled when input is empty or AI is responding */}
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}

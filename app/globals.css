@@ -158,13 +158,13 @@ html:not(.dark) {
 }
 
 html.dark {
-  --background:       #07120d;
-  --surface:          #0d1f15;
+  --background:       #0f1117;
+  --surface:          #1a1d24;
   --foreground:       #e5f2ea;
   --foreground-muted: #7db89a;
-  --border:           #1a3d28;
-  --brand-50:         #0d1f15;
-  --brand-100:        #142e1f;
+  --border:           #2a2d36;
+  --brand-50:         #1a1d24;
+  --brand-100:        #1e2530;
   --brand-200:        #1e4831;
   --brand-300:        #2e6b4a;
 }

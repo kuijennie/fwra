@@ -11,56 +11,6 @@ async function getCallerWithRole(ctx: QueryCtx | MutationCtx): Promise<Doc<"user
     .first();
 }
 
-// Get all active buyers
-export const getAll = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db
-      .query("buyers")
-      .filter((q) => q.eq(q.field("isActive"), true))
-      .collect();
-  },
-});
-
-// Get buyers by county
-export const getByCounty = query({
-  args: { county: v.string() },
-  handler: async (ctx, { county }) => {
-    return await ctx.db
-      .query("buyers")
-      .withIndex("by_county", (q) => q.eq("county", county))
-      .filter((q) => q.eq(q.field("isActive"), true))
-      .collect();
-  },
-});
-
-// Get buyers by product type
-export const getByProductType = query({
-  args: { productType: v.string() },
-  handler: async (ctx, { productType }) => {
-    const allBuyers = await ctx.db
-      .query("buyers")
-      .filter((q) => q.eq(q.field("isActive"), true))
-      .collect();
-
-    return allBuyers.filter((buyer) =>
-      buyer.productTypes.includes(productType)
-    );
-  },
-});
-
-// Get verified buyers only
-export const getVerified = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db
-      .query("buyers")
-      .withIndex("by_verified", (q) => q.eq("isVerified", true))
-      .filter((q) => q.eq(q.field("isActive"), true))
-      .collect();
-  },
-});
-
 // Search buyers
 export const search = query({
   args: {
@@ -99,14 +49,6 @@ export const search = query({
     }
 
     return buyers;
-  },
-});
-
-// Get single buyer by ID
-export const getById = query({
-  args: { id: v.id("buyers") },
-  handler: async (ctx, { id }) => {
-    return await ctx.db.get(id);
   },
 });
 

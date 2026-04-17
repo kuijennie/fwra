@@ -7,14 +7,14 @@ import { api } from "@/convex/_generated/api";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks";
 import {
-  Leaf,
-  Lightbulb,
-  Bell,
-  ChartBar,
-  BookOpen,
-  CircleNotch as Loader2,
-  ArrowRight,
-  Storefront,
+  LeafIcon,
+  LightbulbIcon,
+  BellIcon,
+  ChartBarIcon,
+  BookOpenIcon,
+  CircleNotchIcon as Loader2,
+  ArrowRightIcon,
+  StorefrontIcon,
 } from "@phosphor-icons/react";
 
 export function FarmerDashboardClient() {
@@ -107,7 +107,7 @@ export function FarmerDashboardClient() {
 function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
-      <div className="mb-3 inline-flex rounded-lg bg-green-100 p-2 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+      <div className="mb-3 text-green-600 dark:text-green-400">
         {icon}
       </div>
       <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
@@ -129,7 +129,7 @@ function ActionCard({
 }) {
   return (
     <Link href={href} className="rounded-2xl border border-gray-200 p-4 transition-colors hover:border-green-300 hover:bg-green-50 dark:border-gray-700 dark:hover:border-green-700 dark:hover:bg-green-950/20">
-      <div className="mb-3 inline-flex rounded-lg bg-green-100 p-2 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+      <div className="mb-3 text-green-600 dark:text-green-400">
         {icon}
       </div>
       <div className="mb-1 text-sm font-semibold text-gray-900 dark:text-white">{title}</div>
