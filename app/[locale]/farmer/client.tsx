@@ -13,8 +13,8 @@ import {
   ChartBarIcon, 
   BookOpenIcon, 
   CircleNotchIcon as Loader2, 
+  StorefrontIcon,
   ArrowRightIcon, 
-  StorefrontIcon, 
  } from "@phosphor-icons/react";
 
 export function FarmerDashboardClient() {
@@ -28,14 +28,14 @@ export function FarmerDashboardClient() {
     <RoleGuard allowedRoles={["farmer"]}>
       {sessionLoading || report === undefined ? (
         <main className="min-h-screen bg-gray-50 px-4 py-8 dark:bg-gray-900">
-          <div className="mx-auto flex min-h-[320px] max-w-5xl items-center justify-center">
+          <div className="mx-auto flex min-h-80 max-w-5xl items-center justify-center">
             <Loader2 weight="duotone" className="h-8 w-8 animate-spin text-green-600" />
           </div>
         </main>
       ) : (
         <main className="min-h-screen bg-gray-50 px-4 py-8 dark:bg-gray-900">
           <div className="mx-auto max-w-5xl">
-            <section className="mb-6 rounded-3xl border border-green-200 bg-gradient-to-br from-[#06402B] via-[#0b5a3d] to-[#d8eddc] px-6 py-8 text-white">
+            <section className="mb-6 rounded-3xl border border-green-200 bg-linear-to-br from-[#06402B] via-[#0b5a3d] to-[#d8eddc] px-6 py-8 text-white">
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/75">
                 {tf("eyebrow")}
               </p>
@@ -52,10 +52,10 @@ export function FarmerDashboardClient() {
             </section>
 
             <section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard label={t("reports.totalEntries")} value={String(report.totalEntries)} icon={<Leaf weight="duotone" className="h-5 w-5" />} />
-              <StatCard label={t("reports.totalWaste")} value={`${report.totalVolumeKg} kg`} icon={<ChartBar weight="duotone" className="h-5 w-5" />} />
-              <StatCard label={t("reports.methodsRecommended")} value={String(report.totalRecommendations)} icon={<Lightbulb weight="duotone" className="h-5 w-5" />} />
-              <StatCard label={t("reports.methodsAdopted")} value={String(report.totalAdopted)} icon={<Bell weight="duotone" className="h-5 w-5" />} />
+              <StatCard label={t("reports.totalEntries")} value={String(report.totalEntries)} icon={<LeafIcon weight="duotone" className="h-5 w-5" />} />
+              <StatCard label={t("reports.totalWaste")} value={`${report.totalVolumeKg} kg`} icon={<ChartBarIcon weight="duotone" className="h-5 w-5" />} />
+              <StatCard label={t("reports.methodsRecommended")} value={String(report.totalRecommendations)} icon={<LightbulbIcon weight="duotone" className="h-5 w-5" />} />
+              <StatCard label={t("reports.methodsAdopted")} value={String(report.totalAdopted)} icon={<BellIcon weight="duotone" className="h-5 w-5" />} />
             </section>
 
             <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -67,11 +67,11 @@ export function FarmerDashboardClient() {
                   </Link>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <ActionCard href="/waste-input" title={t("nav.logWaste")} description={t("home.logWasteDesc")} icon={<Leaf weight="duotone" className="h-5 w-5" />} />
-                  <ActionCard href="/recommendations" title={t("nav.recommendations")} description={t("home.getRecommendationsDesc")} icon={<Lightbulb weight="duotone" className="h-5 w-5" />} />
-                  <ActionCard href="/farmer/sell" title={t("nav.sell")} description={t("sell.actionDesc")} icon={<Storefront weight="duotone" className="h-5 w-5" />} />
-                  <ActionCard href="/reminders" title={t("nav.reminders")} description={t("reminders.subtitle")} icon={<Bell weight="duotone" className="h-5 w-5" />} />
-                  <ActionCard href="/tutorials" title={t("nav.tutorials")} description={t("tutorials.subtitle")} icon={<BookOpen weight="duotone" className="h-5 w-5" />} />
+                  <ActionCard href="/waste-input" title={t("nav.logWaste")} description={t("home.logWasteDesc")} icon={<LeafIcon weight="duotone" className="h-5 w-5" />} />
+                  <ActionCard href="/recommendations" title={t("nav.recommendations")} description={t("home.getRecommendationsDesc")} icon={<LightbulbIcon weight="duotone" className="h-5 w-5" />} />
+                  <ActionCard href="/farmer/sell" title={t("nav.sell")} description={t("sell.actionDesc")} icon={<StorefrontIcon weight="duotone" className="h-5 w-5" />} />
+                  <ActionCard href="/reminders" title={t("nav.reminders")} description={t("reminders.subtitle")} icon={<BellIcon weight="duotone" className="h-5 w-5" />} />
+                  <ActionCard href="/tutorials" title={t("nav.tutorials")} description={t("tutorials.subtitle")} icon={<BookOpenIcon weight="duotone" className="h-5 w-5" />} />
                 </div>
               </div>
 
@@ -142,7 +142,7 @@ function PrimaryLink({ href, label }: { href: string; label: string }) {
   return (
     <Link href={href} className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#06402B] transition-opacity hover:opacity-90">
       {label}
-      <ArrowRight weight="bold" className="h-3.5 w-3.5" />
+      <ArrowRightIcon weight="bold" className="h-3.5 w-3.5" />
     </Link>
   );
 }
