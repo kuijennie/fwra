@@ -239,11 +239,6 @@ export function AdminDashboardClient() {
           <p className="text-sm" style={{ color: FGM }}>
             {t("admin.subtitle")}
           </p>
-          {useFallback && (
-            <p className="mt-2 text-xs" style={{ color: FGM }}>
-              Admin access is using your signed-in email fallback in this dev environment.
-            </p>
-          )}
         </div>
 
         {/* Tab bar */}
@@ -366,7 +361,7 @@ export function AdminDashboardClient() {
           </section>
         )}
 
-        {/* ── Content ────────────────────────────────────────────────────── */}
+        {/*  Content */}
         {activeTab === "content" && (
           <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
             <div className="flex items-center border-b px-6 py-4" style={{ borderColor: BRD }}>

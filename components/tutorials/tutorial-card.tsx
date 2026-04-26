@@ -119,10 +119,10 @@ export function TutorialCard({
             {stepsCount} {t("tutorials.steps")}
           </span>
 
-          <span className="flex items-center gap-1 text-xs ml-auto text-gray-500 dark:text-gray-400">
+          {/* <span className="flex items-center gap-1 text-xs ml-auto text-gray-500 dark:text-gray-400">
             <EyeIcon weight="duotone" className="h-3 w-3" />
             {viewCount}
-          </span>
+          </span> */}
         </div>
       </div>
     </Link>

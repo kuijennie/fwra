@@ -474,7 +474,6 @@ export const tutorialSeedData = [
     ],
     applicableWasteTypes: ["maize_stalks", "wheat_straw", "rice_husks", "sugarcane_bagasse"],
     requiredResources: ["space"],
-    viewCount: 156,
     isPublished: true,
   },
   {
@@ -530,7 +529,6 @@ export const tutorialSeedData = [
     ],
     applicableWasteTypes: ["banana_stems", "banana_leaves"],
     requiredResources: ["space"],
-    viewCount: 68,
     isPublished: true,
   },
 

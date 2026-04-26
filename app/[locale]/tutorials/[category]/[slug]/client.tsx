@@ -124,10 +124,10 @@ export function TutorialDetailClient({ slug }: TutorialDetailClientProps) {
               {tutorial.steps.length} {t("tutorials.steps")}
             </span>
 
-            <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+            {/* <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
               <Eye weight="duotone" className="h-4 w-4" />
               {tutorial.viewCount} views
-            </span>
+            </span> */}
           </div>
         </div>
 
