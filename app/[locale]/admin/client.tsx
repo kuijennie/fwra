@@ -99,8 +99,8 @@ export function AdminDashboardClient() {
   const usersFallback = useQuery(api.users.listAllByEmail, useFallback ? { adminEmail: adminEmail! } : "skip");
   const users = usersJwt ?? usersFallback;
 
-  const tutorials = useQuery(api.tutorials.adminListAll);
-  const stories = useQuery(api.successStories.adminListAll);
+  const tutorials = useQuery(api.tutorials.adminListAll, useFallback ? { adminEmail: adminEmail! } : {});
+  const stories = useQuery(api.successStories.adminListAll, useFallback ? { adminEmail: adminEmail! } : {});
 
   const updateRole = useMutation(api.users.updateRole);
   const updateRoleByEmail = useMutation(api.users.updateRoleByEmail);
@@ -201,14 +201,15 @@ export function AdminDashboardClient() {
           content: { en: s.contentEn, sw: s.contentSw },
         })),
       };
+      const fallback = useFallback ? { adminEmail: adminEmail! } : {};
       if (editingTutorialId) {
-        await updateTutorial({ id: editingTutorialId, ...payload });
+        await updateTutorial({ id: editingTutorialId, ...payload, ...fallback });
       } else {
         const slug = tutorialForm.titleEn
           .toLowerCase()
           .replace(/\s+/g, "-")
           .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
-        await createTutorial({ slug, ...payload });
+        await createTutorial({ slug, ...payload, ...fallback });
       }
       closeTutorialForm();
     } catch (err) {
@@ -240,7 +241,7 @@ export function AdminDashboardClient() {
 
   const handleDeleteTutorial = async (id: Id<"tutorials">) => {
     if (!confirm("Delete this tutorial?")) return;
-    await deleteTutorial({ id });
+    await deleteTutorial({ id, ...(useFallback ? { adminEmail: adminEmail! } : {}) });
   };
 
   // ── Story handlers ────────────────────────────────────────────────────────
@@ -261,10 +262,11 @@ export function AdminDashboardClient() {
         story: { en: storyForm.storyEn, sw: storyForm.storySw },
         results: { en: storyForm.resultsEn, sw: storyForm.resultsSw },
       };
+      const fallback = useFallback ? { adminEmail: adminEmail! } : {};
       if (editingStoryId) {
-        await updateStory({ id: editingStoryId, ...payload });
+        await updateStory({ id: editingStoryId, ...payload, ...fallback });
       } else {
-        await createStory(payload);
+        await createStory({ ...payload, ...fallback });
       }
       closeStoryForm();
     } finally {
@@ -604,7 +606,7 @@ export function AdminDashboardClient() {
                             {t("admin.delete")}
                           </button>
                           <button
-                            onClick={() => setPublished({ id: tut._id, isPublished: !tut.isPublished })}
+                            onClick={() => setPublished({ id: tut._id, isPublished: !tut.isPublished, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
                             className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
                             style={{ borderColor: BRD, color: FG, background: SUR }}
                           >
@@ -718,7 +720,7 @@ export function AdminDashboardClient() {
                           </span>
                           {!story.isApproved && (
                             <button
-                              onClick={() => setApproved({ id: story._id, isApproved: true })}
+                              onClick={() => setApproved({ id: story._id, isApproved: true, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
                               className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
                               style={{ borderColor: BRD, color: "#166534", background: SUR }}
                             >
@@ -735,7 +737,7 @@ export function AdminDashboardClient() {
                             {t("admin.edit")}
                           </button>
                           <button
-                            onClick={() => deleteStory({ id: story._id })}
+                            onClick={() => deleteStory({ id: story._id, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
                             className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
                             style={{ borderColor: BRD, color: "#dc2626", background: SUR }}
                           >

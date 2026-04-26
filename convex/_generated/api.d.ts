@@ -9,6 +9,7 @@
  */
 
 import type * as buyers from "../buyers.js";
+import type * as crons from "../crons.js";
 import type * as email from "../email.js";
 import type * as legalDocuments from "../legalDocuments.js";
 import type * as recommendations from "../recommendations.js";
@@ -32,6 +33,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   buyers: typeof buyers;
+  crons: typeof crons;
   email: typeof email;
   legalDocuments: typeof legalDocuments;
   recommendations: typeof recommendations;

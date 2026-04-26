@@ -2,7 +2,9 @@ import { v } from "convex/values";
 import { mutation, query, action } from "./_generated/server";
 import { api } from "./_generated/api";
 
-// Recycling method definitions (duplicated for Convex runtime)
+// I defined all 5 recycling methods here with the criteria I use to score them.
+// Each method has the waste types it works for, the resources needed, how well
+// it performs in each climate zone, and the minimum volume to make it worthwhile.
 const recyclingMethods = [
   {
     id: "composting",
@@ -15,6 +17,7 @@ const recyclingMethods = [
       "tea_waste", "cow_dung", "goat_droppings", "chicken_manure",
       "vegetable_peels", "food_leftovers", "spoiled_produce",
     ],
+    // Higher score = better suited for that climate
     climateScores: { arid: 5, semi_arid: 7, sub_humid: 9, humid: 10 },
     minimumVolumeKg: 20,
     waterRequirement: "medium",
@@ -44,6 +47,7 @@ const recyclingMethods = [
       "maize_stalks", "wheat_straw", "rice_husks", "sugarcane_bagasse",
       "bean_residue", "tea_waste",
     ],
+    // Mulching is most valuable in dry/arid areas where soil moisture is precious
     climateScores: { arid: 10, semi_arid: 9, sub_humid: 7, humid: 5 },
     minimumVolumeKg: 10,
     waterRequirement: "low",
@@ -58,6 +62,7 @@ const recyclingMethods = [
       "maize_stalks", "wheat_straw", "bean_residue",
       "vegetable_trimmings", "spoiled_produce",
     ],
+    // Animal feed works equally well across all climates
     climateScores: { arid: 8, semi_arid: 8, sub_humid: 8, humid: 8 },
     minimumVolumeKg: 5,
     waterRequirement: "low",
@@ -72,6 +77,7 @@ const recyclingMethods = [
       "vegetable_peels", "fruit_peels", "coffee_pulp",
       "food_leftovers", "cow_dung", "goat_droppings",
     ],
+    // Worms need moisture — not great in arid zones
     climateScores: { arid: 4, semi_arid: 6, sub_humid: 9, humid: 8 },
     minimumVolumeKg: 5,
     waterRequirement: "medium",
@@ -79,7 +85,8 @@ const recyclingMethods = [
   },
 ];
 
-// County climate zones (subset for runtime)
+// I mapped each Kenyan county to its climate zone so the scoring can factor in
+// the local weather conditions when recommending a recycling method.
 const countyClimateZones: Record<string, string> = {
   nairobi: "sub_humid", kiambu: "sub_humid", nakuru: "sub_humid",
   mombasa: "humid", kisumu: "sub_humid", machakos: "semi_arid",
@@ -89,7 +96,8 @@ const countyClimateZones: Record<string, string> = {
   marsabit: "arid", isiolo: "arid", kitui: "semi_arid", makueni: "semi_arid",
 };
 
-// Reasoning templates
+// Pre-written explanations for each method in both English and Swahili.
+// These are shown to the farmer as the "reason" for the recommendation.
 const reasoningTemplates = {
   composting: {
     en: "Composting is ideal for your waste type and volume. It will produce nutrient-rich soil amendment in 4-8 weeks.",
@@ -113,7 +121,9 @@ const reasoningTemplates = {
   },
 };
 
-// Calculate recommendation score for a method
+// This is the core scoring function. It takes what the farmer entered and scores
+// each recycling method out of 100 based on 5 factors.
+// If the waste type doesn't work for a method at all, I return 0 immediately.
 function calculateScore(
   method: typeof recyclingMethods[0],
   wasteSubType: string,
@@ -124,58 +134,60 @@ function calculateScore(
 ): number {
   let score = 0;
 
-  // Waste type compatibility (0-30 points)
+  // 1. Waste type match (0-30 points) — most important factor
   if (method.suitableWasteTypes.includes(wasteSubType)) {
     score += 30;
   } else {
-    return 0; // Not suitable at all
+    return 0; // this method doesn't work for this waste at all
   }
 
-  // Volume appropriateness (0-20 points)
+  // 2. Volume check (0-20 points) — partial credit if they have at least half the minimum
   if (volumeKg >= method.minimumVolumeKg) {
     score += 20;
   } else if (volumeKg >= method.minimumVolumeKg * 0.5) {
     score += 10;
   }
 
-  // Resource availability (0-25 points)
+  // 3. Resource availability (0-25 points) — score proportionally based on how many
+  //    required resources the farmer actually has
   const requiredResources = method.requiredResources;
   const matchedResources = requiredResources.filter((r) => resources.includes(r));
   score += Math.round((matchedResources.length / requiredResources.length) * 25);
 
-  // Climate suitability (0-15 points)
+  // 4. Climate suitability (0-15 points) — how well this method performs in the
+  //    farmer's county climate zone
   const climateZone = countyClimateZones[county] || "sub_humid";
   const climateScore = method.climateScores[climateZone as keyof typeof method.climateScores] || 5;
   score += Math.round((climateScore / 10) * 15);
 
-  // Season adjustment (0-10 points)
+  // 5. Season bonus (0-10 points) — certain methods work better in certain seasons
   if (method.id === "mulching" && season === "dry") {
-    score += 10; // Mulching is excellent in dry season
+    score += 10; // mulching saves the most water in dry season
   } else if (method.id === "biogas" && season === "wet") {
-    score += 8; // More water available for biogas
+    score += 8; // more water available for the biogas process
   } else if (method.id === "composting") {
-    score += 7; // Composting works year-round
+    score += 7; // composting works reliably year-round
   } else {
     score += 5;
   }
 
-  return Math.min(score, 100);
+  return Math.min(score, 100); // cap at 100
 }
 
-// Generate recommendations for a waste entry
+// When the farmer submits their waste form, this mutation runs the scoring,
+// picks the top 3 methods, and saves them as recommendation records in the database.
 export const generate = mutation({
   args: {
     wasteEntryId: v.id("wasteEntries"),
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
-    // Get the waste entry
     const wasteEntry = await ctx.db.get(args.wasteEntryId);
     if (!wasteEntry) {
       throw new Error("Waste entry not found");
     }
 
-    // Calculate scores for each method
+    // Score every recycling method against what the farmer submitted
     const scores = recyclingMethods.map((method) => ({
       method,
       score: calculateScore(
@@ -188,13 +200,13 @@ export const generate = mutation({
       ),
     }));
 
-    // Filter out unsuitable methods and sort by score
+    // Drop any method with score 0 (unsuitable), sort by score, keep top 3
     const suitableMethods = scores
       .filter((s) => s.score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 3); // Top 3 recommendations
+      .slice(0, 3);
 
-    // Create recommendation records
+    // Save each recommendation to the database
     const recommendationIds = [];
     for (const { method, score } of suitableMethods) {
       const reasoning = reasoningTemplates[method.id as keyof typeof reasoningTemplates];
@@ -219,7 +231,7 @@ export const generate = mutation({
       recommendationIds.push(recId);
     }
 
-    // Update waste entry status
+    // Mark the waste entry as being processed
     await ctx.db.patch(args.wasteEntryId, {
       status: "processing",
     });
@@ -228,7 +240,7 @@ export const generate = mutation({
   },
 });
 
-// Get recommendations by waste entry
+// Fetch all recommendations linked to a specific waste entry
 export const getByWasteEntry = query({
   args: {
     wasteEntryId: v.id("wasteEntries"),
@@ -244,7 +256,7 @@ export const getByWasteEntry = query({
   },
 });
 
-// Get recommendations by session
+// Fetch all recommendations for an anonymous or logged-in session
 export const getBySession = query({
   args: {
     sessionId: v.string(),
@@ -260,7 +272,7 @@ export const getBySession = query({
   },
 });
 
-// Get recent recommendations for a session
+// Used on the home/dashboard to show only the most recent recommendations
 export const getRecent = query({
   args: {
     sessionId: v.string(),
@@ -279,13 +291,13 @@ export const getRecent = query({
   },
 });
 
-// Get recommendations for the most recent waste entry
+// Gets recommendations for the most recent waste entry — used right after submission
+// so the farmer immediately sees their results without needing to pass an entry ID
 export const getLatest = query({
   args: {
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
-    // Get the most recent waste entry
     const latestEntry = await ctx.db
       .query("wasteEntries")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
@@ -294,7 +306,6 @@ export const getLatest = query({
 
     if (!latestEntry) return [];
 
-    // Get recommendations for that specific entry
     const recommendations = await ctx.db
       .query("recommendations")
       .withIndex("by_waste_entry", (q) => q.eq("wasteEntryId", latestEntry._id))
@@ -305,7 +316,8 @@ export const getLatest = query({
   },
 });
 
-// Select a recommendation
+// When the farmer picks a recommendation, I deselect all others for that waste entry
+// and mark this one as selected, then update the waste entry status to "completed"
 export const select = mutation({
   args: {
     id: v.id("recommendations"),
@@ -316,7 +328,7 @@ export const select = mutation({
       throw new Error("Recommendation not found");
     }
 
-    // Deselect other recommendations for the same waste entry
+    // Deselect any previously selected recommendation for the same waste entry
     const otherRecs = await ctx.db
       .query("recommendations")
       .withIndex("by_waste_entry", (q) =>
@@ -330,10 +342,9 @@ export const select = mutation({
       }
     }
 
-    // Select this recommendation
     await ctx.db.patch(args.id, { isSelected: true });
 
-    // Update waste entry status
+    // Mark the waste entry as done
     await ctx.db.patch(recommendation.wasteEntryId, {
       status: "completed",
     });

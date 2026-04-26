@@ -11,6 +11,21 @@ async function getCallerWithRole(ctx: QueryCtx | MutationCtx): Promise<Doc<"user
     .first();
 }
 
+async function getAdminByEmail(ctx: QueryCtx | MutationCtx, email: string): Promise<Doc<"users"> | null> {
+  const user = await ctx.db.query("users").filter((q) => q.eq(q.field("email"), email)).first();
+  return user?.role === "admin" ? user : null;
+}
+
+async function requireAdmin(ctx: QueryCtx | MutationCtx, adminEmail?: string): Promise<Doc<"users">> {
+  const caller = await getCallerWithRole(ctx);
+  if (caller?.role === "admin") return caller;
+  if (adminEmail) {
+    const byEmail = await getAdminByEmail(ctx, adminEmail);
+    if (byEmail) return byEmail;
+  }
+  throw new Error("Unauthorized");
+}
+
 // Get all approved success stories
 export const getApproved = query({
   args: {},
@@ -33,15 +48,15 @@ export const getByIdInternal = internalQuery({
 // Admin: create a new story
 export const adminCreate = mutation({
   args: {
+    adminEmail: v.optional(v.string()),
     farmerName: v.string(),
     county: v.string(),
     method: v.string(),
     story: v.object({ en: v.string(), sw: v.string() }),
     results: v.object({ en: v.string(), sw: v.string() }),
   },
-  handler: async (ctx, args) => {
-    const caller = await getCallerWithRole(ctx);
-    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+  handler: async (ctx, { adminEmail, ...args }) => {
+    await requireAdmin(ctx, adminEmail);
     return await ctx.db.insert("successStories", {
       ...args,
       isApproved: false,
@@ -53,6 +68,7 @@ export const adminCreate = mutation({
 // Admin: update an existing story
 export const adminUpdate = mutation({
   args: {
+    adminEmail: v.optional(v.string()),
     id: v.id("successStories"),
     farmerName: v.string(),
     county: v.string(),
@@ -60,9 +76,8 @@ export const adminUpdate = mutation({
     story: v.object({ en: v.string(), sw: v.string() }),
     results: v.object({ en: v.string(), sw: v.string() }),
   },
-  handler: async (ctx, { id, ...rest }) => {
-    const caller = await getCallerWithRole(ctx);
-    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+  handler: async (ctx, { adminEmail, id, ...rest }) => {
+    await requireAdmin(ctx, adminEmail);
     await ctx.db.patch(id, rest);
     return { success: true };
   },
@@ -70,20 +85,23 @@ export const adminUpdate = mutation({
 
 // Admin: list all stories (including unapproved)
 export const adminListAll = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { adminEmail: v.optional(v.string()) },
+  handler: async (ctx, { adminEmail }) => {
     const caller = await getCallerWithRole(ctx);
-    if (!caller || caller.role !== "admin") return null;
-    return await ctx.db.query("successStories").order("desc").collect();
+    if (caller?.role === "admin") return await ctx.db.query("successStories").order("desc").collect();
+    if (adminEmail) {
+      const byEmail = await getAdminByEmail(ctx, adminEmail);
+      if (byEmail) return await ctx.db.query("successStories").order("desc").collect();
+    }
+    return null;
   },
 });
 
 // Admin: approve or reject a story
 export const adminSetApproved = mutation({
-  args: { id: v.id("successStories"), isApproved: v.boolean() },
-  handler: async (ctx, { id, isApproved }) => {
-    const caller = await getCallerWithRole(ctx);
-    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+  args: { adminEmail: v.optional(v.string()), id: v.id("successStories"), isApproved: v.boolean() },
+  handler: async (ctx, { adminEmail, id, isApproved }) => {
+    await requireAdmin(ctx, adminEmail);
     await ctx.db.patch(id, { isApproved });
     return { success: true };
   },
@@ -91,10 +109,9 @@ export const adminSetApproved = mutation({
 
 // Admin: delete a story
 export const adminDelete = mutation({
-  args: { id: v.id("successStories") },
-  handler: async (ctx, { id }) => {
-    const caller = await getCallerWithRole(ctx);
-    if (!caller || caller.role !== "admin") throw new Error("Unauthorized");
+  args: { adminEmail: v.optional(v.string()), id: v.id("successStories") },
+  handler: async (ctx, { adminEmail, id }) => {
+    await requireAdmin(ctx, adminEmail);
     await ctx.db.delete(id);
     return { success: true };
   },

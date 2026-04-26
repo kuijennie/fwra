@@ -32,12 +32,6 @@ export default defineSchema({
     location: v.object({
       county: v.string(),
       subCounty: v.optional(v.string()),
-      coordinates: v.optional(
-        v.object({
-          lat: v.number(),
-          lng: v.number(),
-        })
-      ),
     }),
     availableResources: v.array(v.string()), // ['water', 'labor', 'containers', 'shade']
     currentSeason: v.string(), // 'dry', 'wet', 'transition'
@@ -169,12 +163,6 @@ export default defineSchema({
     county: v.string(),
     subCounty: v.optional(v.string()),
     address: v.optional(v.string()),
-    coordinates: v.optional(
-      v.object({
-        lat: v.number(),
-        lng: v.number(),
-      })
-    ),
     productTypes: v.array(v.string()), // ['compost', 'bio_fertilizer', 'biogas_equipment', 'organic_feed', 'animal_feed', 'silage', 'mulch']
     description: v.object({
       en: v.string(),

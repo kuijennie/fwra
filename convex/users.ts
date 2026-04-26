@@ -2,6 +2,9 @@ import { query, mutation, internalQuery, QueryCtx, MutationCtx } from "./_genera
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 
+// Looks up the currently logged-in user using the Clerk JWT token.
+// Convex verifies the token and gives us the identity — I then use the clerkId
+// to find the matching user record in my database.
 async function getCurrentUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users"> | null> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) return null;
@@ -11,6 +14,8 @@ async function getCurrentUser(ctx: QueryCtx | MutationCtx): Promise<Doc<"users">
     .first();
 }
 
+// Fallback lookup for when JWT auth isn't available.
+// I use this in admin mutations that need to support email-based verification.
 async function getUserByEmail(ctx: QueryCtx | MutationCtx, email: string): Promise<Doc<"users"> | null> {
   return await ctx.db
     .query("users")
@@ -18,6 +23,8 @@ async function getUserByEmail(ctx: QueryCtx | MutationCtx, email: string): Promi
     .first();
 }
 
+// Guard for JWT-authenticated admin mutations.
+// Throws immediately if the caller isn't logged in or isn't an admin.
 async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<Doc<"users">> {
   const user = await getCurrentUser(ctx);
   if (!user || user.role !== "admin") {
@@ -26,6 +33,9 @@ async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<Doc<"users">> 
   return user;
 }
 
+// Fallback guard used when Clerk JWT isn't configured on Convex.
+// Verifies admin status by email instead of JWT — used in the admin dashboard
+// when the CLERK_ISSUER_URL environment variable isn't set.
 async function requireAdminByEmail(ctx: QueryCtx | MutationCtx, email: string): Promise<Doc<"users">> {
   const user = await getUserByEmail(ctx, email);
   if (!user || user.role !== "admin") {
@@ -34,10 +44,12 @@ async function requireAdminByEmail(ctx: QueryCtx | MutationCtx, email: string): 
   return user;
 }
 
+// Shared stats builder used by both getStats and getStatsByEmail so I don't repeat the logic
 function buildStats(allUsers: Doc<"users">[], allEntries: { sessionId: string }[], totalRecommendations: number, totalReminders: number) {
   const farmers = allUsers.filter((u) => u.role === "farmer").length;
   const buyers = allUsers.filter((u) => u.role === "buyer").length;
   const admins = allUsers.filter((u) => u.role === "admin").length;
+  // Count unique anonymous sessions from waste entries
   const uniqueSessions = new Set(allEntries.map((e) => e.sessionId));
 
   return {
@@ -52,6 +64,10 @@ function buildStats(allUsers: Doc<"users">[], allEntries: { sessionId: string }[
   };
 }
 
+// Called every time a user signs in via Clerk.
+// If they already exist in my database I just update their last active time.
+// If they're new — the first user ever becomes admin, everyone else starts as "pending"
+// and must pick a role (farmer or buyer) before accessing the app.
 export const getOrCreateFromClerk = mutation({
   args: {},
   handler: async (ctx) => {
@@ -70,6 +86,7 @@ export const getOrCreateFromClerk = mutation({
       return existingUser._id;
     }
 
+    // First user ever = admin. Everyone after that starts as pending.
     const anyUser = await ctx.db.query("users").first();
     const role = anyUser ? "pending" : "admin";
 
@@ -89,6 +106,8 @@ export const getOrCreateFromClerk = mutation({
   },
 });
 
+// Returns the currently logged-in user's full record — used across the app
+// to check roles and personalize the UI
 export const getCurrent = query({
   args: {},
   handler: async (ctx) => {
@@ -96,6 +115,7 @@ export const getCurrent = query({
   },
 });
 
+// Looks up any user by email — used as a fallback when JWT auth isn't available
 export const getByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
@@ -103,6 +123,9 @@ export const getByEmail = query({
   },
 });
 
+// When a user signs in after using the app anonymously, I link all their
+// previous data (waste entries, recommendations, reminders) to their account
+// so nothing gets lost from their anonymous session.
 export const linkSessionToUser = mutation({
   args: { sessionId: v.string() },
   handler: async (ctx, { sessionId }) => {
@@ -120,6 +143,7 @@ export const linkSessionToUser = mutation({
       return { linked: 0 };
     }
 
+    // Attach userId to all waste entries from this anonymous session
     const entries = await ctx.db
       .query("wasteEntries")
       .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
@@ -130,6 +154,7 @@ export const linkSessionToUser = mutation({
       }
     }
 
+    // Attach userId to all recommendations from this anonymous session
     const recs = await ctx.db
       .query("recommendations")
       .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
@@ -140,6 +165,7 @@ export const linkSessionToUser = mutation({
       }
     }
 
+    // Attach userId to all reminders from this anonymous session
     const reminders = await ctx.db
       .query("reminders")
       .withIndex("by_session", (q) => q.eq("sessionId", sessionId))
@@ -154,6 +180,8 @@ export const linkSessionToUser = mutation({
   },
 });
 
+// New users start as "pending" — they must choose farmer or buyer before proceeding.
+// This mutation sets their role. I only allow it once (role must still be "pending").
 export const selectRole = mutation({
   args: {
     role: v.union(v.literal("farmer"), v.literal("buyer")),
@@ -167,7 +195,8 @@ export const selectRole = mutation({
   },
 });
 
-// JWT-auth-free version: looks up user by clerkId directly (mirrors seedUser pattern)
+// Same as selectRole but bypasses JWT — used when Clerk JWT isn't available on Convex.
+// Identifies the user directly by their Clerk ID instead.
 export const selectRoleByClerkId = mutation({
   args: {
     clerkId: v.string(),
@@ -185,6 +214,7 @@ export const selectRoleByClerkId = mutation({
   },
 });
 
+// Admin only: change any user's role via the admin dashboard
 export const updateRole = mutation({
   args: {
     userId: v.id("users"),
@@ -202,6 +232,7 @@ export const updateRole = mutation({
   },
 });
 
+// Email-based fallback for updateRole — used when JWT auth isn't available
 export const updateRoleByEmail = mutation({
   args: {
     adminEmail: v.string(),
@@ -220,6 +251,7 @@ export const updateRoleByEmail = mutation({
   },
 });
 
+// Admin only: list all users in the system (JWT auth version)
 export const listAll = query({
   args: {},
   handler: async (ctx) => {
@@ -230,6 +262,7 @@ export const listAll = query({
   },
 });
 
+// Admin only: list all users (email fallback version)
 export const listAllByEmail = query({
   args: { adminEmail: v.string() },
   handler: async (ctx, { adminEmail }) => {
@@ -238,6 +271,7 @@ export const listAllByEmail = query({
   },
 });
 
+// Admin only: dashboard stats (JWT auth version)
 export const getStats = query({
   args: {},
   handler: async (ctx) => {
@@ -253,6 +287,7 @@ export const getStats = query({
   },
 });
 
+// Admin only: dashboard stats (email fallback version)
 export const getStatsByEmail = query({
   args: { adminEmail: v.string() },
   handler: async (ctx, { adminEmail }) => {
@@ -267,14 +302,14 @@ export const getStatsByEmail = query({
   },
 });
 
-// Internal: get current user (used by Convex actions)
+// Internal query used by Convex actions (not callable from the browser)
 export const getCurrentUserInternal = internalQuery({
   handler: async (ctx) => {
     return await getCurrentUser(ctx);
   },
 });
 
-// Internal: get all users who have an email address (used for email campaigns)
+// Internal query used by email actions to get all users who have an email address
 export const getUsersWithEmails = internalQuery({
   handler: async (ctx) => {
     const users = await ctx.db.query("users").collect();
@@ -282,7 +317,9 @@ export const getUsersWithEmails = internalQuery({
   },
 });
 
-// Dev helper: seed the first admin user when auth bootstrap is unavailable.
+// Dev/setup helper — seeds an admin user directly from the Convex dashboard.
+// I use this when Clerk JWT isn't configured yet and I need to bootstrap the first admin.
+// It updates the user if they already exist, or creates them if they don't.
 export const seedAdmin = mutation({
   args: {
     clerkId: v.string(),
@@ -319,6 +356,8 @@ export const seedAdmin = mutation({
   },
 });
 
+// Dev helper — seeds any user with any role. Useful for testing different roles
+// without going through the full sign-up flow.
 export const seedUser = mutation({
   args: {
     clerkId: v.string(),
