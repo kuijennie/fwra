@@ -8,14 +8,8 @@ import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks/use-session";
 import { ReminderList, ReminderForm } from "@/components/reminders";
 import { Button, Card } from "@/components/ui";
-import {
-  Bell,
-  Plus,
-  Clock,
-  CheckCircle,
-  WarningCircle as AlertCircle,
-  CircleNotch as Loader2,
-} from "@phosphor-icons/react";
+import { BellIcon as Bell, PlusIcon as Plus, ClockIcon as Clock, CheckCircleIcon as CheckCircle, WarningCircleIcon as AlertCircle, CircleNotchIcon as Loader2, 
+ } from "@phosphor-icons/react";
 
 export function RemindersClient() {
   const t = useTranslations();

@@ -10,7 +10,7 @@ import { LocationPicker } from "./location-picker";
 import { ResourceChecklist } from "./resource-checklist";
 import { SeasonSelector } from "./season-selector";
 import { type WasteCategory, volumeUnits } from "@/lib/constants";
-import { ArrowRight, CircleNotch as Loader2 } from "@phosphor-icons/react";
+import { ArrowRightIcon as ArrowRight, CircleNotchIcon as Loader2 } from "@phosphor-icons/react";
 
 export interface WasteInputData {
   wasteType: WasteCategory;

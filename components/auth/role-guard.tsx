@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useQuery } from "convex/react";
-import { CircleNotch as Loader2, ShieldWarning as ShieldAlert } from "@phosphor-icons/react";
+import { CircleNotchIcon as Loader2, ShieldWarningIcon as ShieldAlert } from "@phosphor-icons/react";
 import { api } from "@/convex/_generated/api";
 import { Link } from "@/lib/i18n/navigation";
 import { AppRole, isAppRole } from "@/lib/auth/roles";

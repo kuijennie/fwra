@@ -2,7 +2,7 @@
 
 import { forwardRef, type InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-import { Check } from "@phosphor-icons/react";
+import { CheckIcon as Check } from "@phosphor-icons/react";
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {

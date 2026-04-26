@@ -1,6 +1,6 @@
 "use client";
 
-import { WifiSlash as WifiOff, X } from "@phosphor-icons/react";
+import { WifiSlashIcon as WifiOff, XIcon as X } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
 import { useOnlineStatus } from "@/lib/hooks";
 

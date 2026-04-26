@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, Badge, Button } from "@/components/ui";
-import { Check, Clock, Trash as Trash2, ArrowClockwise as RefreshCw, WarningCircle as AlertCircle, ArrowsCounterClockwise, Fire, Grains, Drop, FileText, type Icon } from "@phosphor-icons/react";
+import { CheckIcon as Check, ClockIcon as Clock, TrashIcon as Trash2, ArrowClockwiseIcon as RefreshCw, WarningCircleIcon as AlertCircle, ArrowsCounterClockwiseIcon as ArrowsCounterClockwise, FireIcon as Fire, GrainsIcon as Grains, DropIcon as Drop, FileTextIcon as FileText,  type Icon  } from "@phosphor-icons/react";
 import { formatDistanceToNow, format, isPast, isToday } from "date-fns";
 import type { Doc } from "@/convex/_generated/dataModel";
 

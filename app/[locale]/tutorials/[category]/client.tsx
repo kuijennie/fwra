@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { TutorialGrid } from "@/components/tutorials";
 import { Link } from "@/lib/i18n/navigation";
-import { CaretLeft as ChevronLeft } from "@phosphor-icons/react";
+import { CaretLeftIcon as ChevronLeft } from "@phosphor-icons/react";
 
 interface CategoryPageClientProps {
   category: string;

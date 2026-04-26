@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChatCircleIcon as MessageCircle, XIcon as X, PaperPlaneTiltIcon as Send, CircleNotchIcon as Loader2, SparkleIcon as Sparkles } from "@phosphor-icons/react";
+import {  ChatCircleIcon as MessageCircle,  XIcon as X,  PaperPlaneTiltIcon as Send,  CircleNotchIcon as Loader2,  SparkleIcon as Sparkles  } from "@phosphor-icons/react";
 import ReactMarkdown from "react-markdown";
 
 // A single chat message — either from the user or the AI assistant

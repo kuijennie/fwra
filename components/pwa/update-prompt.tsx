@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowClockwise as RefreshCw, X } from "@phosphor-icons/react";
+import { ArrowClockwiseIcon as RefreshCw, XIcon as X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { useServiceWorker } from "@/lib/hooks";
 

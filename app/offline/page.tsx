@@ -1,6 +1,6 @@
 "use client";
 
-import { WifiSlash as WifiOff } from "@phosphor-icons/react";
+import { WifiSlashIcon as WifiOff } from "@phosphor-icons/react";
 
 export default function OfflinePage() {
   return (

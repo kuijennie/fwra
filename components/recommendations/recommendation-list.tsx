@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { RecommendationCard } from "./recommendation-card";
-import { Lightbulb } from "@phosphor-icons/react";
+import { LightbulbIcon as Lightbulb } from "@phosphor-icons/react";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface Recommendation {

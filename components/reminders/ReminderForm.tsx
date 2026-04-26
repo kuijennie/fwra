@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, Button, Input, Select } from "@/components/ui";
-import { Plus, X, ArrowsCounterClockwise, Fire, Grains, Drop, FileText, type Icon } from "@phosphor-icons/react";
+import { PlusIcon as Plus, XIcon as X, ArrowsCounterClockwiseIcon as ArrowsCounterClockwise, FireIcon as Fire, GrainsIcon as Grains, DropIcon as Drop, FileTextIcon as FileText,  type Icon  } from "@phosphor-icons/react";
 
 interface ReminderFormProps {
   sessionId: string;

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { TutorialCard } from "./tutorial-card";
-import { BookOpen } from "@phosphor-icons/react";
+import { BookOpenIcon as BookOpen } from "@phosphor-icons/react";
 
 interface Tutorial {
   _id: string;

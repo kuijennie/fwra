@@ -131,27 +131,6 @@ export default defineSchema({
     .index("by_difficulty", ["difficulty"])
     .index("by_published", ["isPublished"]),
 
-  // Success stories / testimonials
-  successStories: defineTable({
-    tutorialId: v.optional(v.id("tutorials")),
-    farmerName: v.string(),
-    county: v.string(),
-    method: v.string(),
-    story: v.object({
-      en: v.string(),
-      sw: v.string(),
-    }),
-    results: v.object({
-      en: v.string(),
-      sw: v.string(),
-    }),
-    isApproved: v.boolean(),
-    createdAt: v.number(),
-  })
-    .index("by_method", ["method"])
-    .index("by_county", ["county"])
-    .index("by_approved", ["isApproved"]),
-
   // Marketplace buyers directory
   buyers: defineTable({
     userId: v.optional(v.id("users")),

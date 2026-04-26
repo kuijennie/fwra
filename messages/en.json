@@ -32,7 +32,6 @@
     "recommendations": "Recommendations",
     "reminders": "Reminders",
     "legal": "Legal Info",
-    "stories": "Stories",
     "reports": "Reports",
     "signIn": "Sign In",
     "admin": "Admin",
@@ -51,8 +50,7 @@
     "browseTutorialsDesc": "Learn step-by-step guides",
     "featuredTutorials": "Featured Tutorials",
     "recentActivity": "Recent Activity",
-    "noActivity": "No recent activity",
-    "successStories": "Success Stories"
+    "noActivity": "No recent activity"
   },
   "wasteInput": {
     "title": "Log Your Waste",
@@ -137,8 +135,6 @@
     "watchVideo": "Watch video",
     "completeTutorial": "Complete",
     "noTutorials": "No tutorials found",
-    "successStories": "Success Stories",
-    "fromFarmers": "from farmers who used this method"
   },
   "marketplace": {
     "title": "Marketplace",
@@ -259,27 +255,6 @@
     "editProfile": "Edit Profile",
     "role": "Role"
   },
-  "stories": {
-    "title": "Success Stories",
-    "subtitle": "Real stories from Kenyan farmers who turned waste into value",
-    "totalStories": "Stories",
-    "methodsUsed": "Methods",
-    "counties": "Counties",
-    "allMethods": "All",
-    "methods": {
-      "composting": "Composting",
-      "biogas": "Biogas",
-      "mulching": "Mulching",
-      "animal_feed": "Animal Feed",
-      "vermicompost": "Vermicompost"
-    },
-    "showingResults": "Showing {count} stories",
-    "noStories": "No stories found",
-    "noStoriesDescription": "Try selecting a different method",
-    "ctaTitle": "Have a success story?",
-    "ctaDescription": "Share how farm waste recycling has helped your farm and inspire other farmers.",
-    "ctaContact": "Send your story to stories@fwra.co.ke"
-  },
   "reports": {
     "title": "Your Activity Reports",
     "subtitle": "Track your waste logging and recycling progress",
@@ -392,7 +367,6 @@
     "totalReminders": "Reminders",
     "totalBuyers": "Total Buyers",
     "verifiedBuyers": "Verified Buyers",
-    "pendingStories": "Pending Stories",
     "publishedTutorials": "Published Tutorials",
     "changeRole": "Role",
     "accessDenied": "Access Denied",
@@ -413,13 +387,7 @@
     "activate": "Activate",
     "deactivate": "Deactivate",
     "noBuyers": "No buyer listings yet",
-    "successStories": "Success Stories",
-    "storiesSubtitle": "Approve or reject farmer submissions",
-    "pending": "pending",
-    "approved": "Approved",
-    "approve": "Approve",
     "delete": "Delete",
-    "noStories": "No success stories yet",
     "tutorials": "Tutorials",
     "tutorialsSubtitle": "Publish or unpublish tutorial content",
     "published": "Published",
@@ -427,9 +395,7 @@
     "noTutorials": "No tutorials yet",
     "edit": "Edit",
     "editTutorial": "Edit Tutorial",
-    "editStory": "Edit Story",
     "createTutorial": "Create Tutorial",
-    "createStory": "Create Story",
     "titleEn": "Title (English)",
     "titleSw": "Title (Swahili)",
     "descriptionEn": "Description (English)",
@@ -448,16 +414,9 @@
     "stepTitleSw": "Step Title (Swahili)",
     "stepContentEn": "Step Content (English)",
     "stepContentSw": "Step Content (Swahili)",
-    "farmerName": "Farmer Name",
-    "method": "Method",
-    "storyEn": "Story (English)",
-    "storySw": "Story (Swahili)",
-    "resultsEn": "Results (English)",
-    "resultsSw": "Results (Swahili)",
     "creating": "Creating...",
     "sending": "Sending...",
-    "contentTabTutorials": "Tutorials",
-    "contentTabStories": "Stories"
+    "contentTabTutorials": "Tutorials"
   },
   "roles": {
     "farmer": "Farmer",

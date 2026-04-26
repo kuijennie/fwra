@@ -10,7 +10,6 @@ const anonymousDesktopNav: NavItem[] = [
   { href: "/recommendations", labelKey: "nav.recommendations" },
   { href: "/tutorials", labelKey: "nav.tutorials" },
   { href: "/marketplace", labelKey: "nav.marketplace" },
-  { href: "/success-stories", labelKey: "nav.stories" },
   { href: "/reports", labelKey: "nav.reports" },
 ];
 
@@ -30,7 +29,6 @@ const roleDesktopNav: Record<AppRole, NavItem[]> = {
     { href: "/admin", labelKey: "roles.admin" },
     { href: "/marketplace", labelKey: "nav.marketplace" },
     { href: "/tutorials", labelKey: "nav.tutorials" },
-    { href: "/success-stories", labelKey: "nav.stories" },
   ],
 };
 

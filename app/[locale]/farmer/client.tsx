@@ -6,16 +6,16 @@ import { Link } from "@/lib/i18n/navigation";
 import { api } from "@/convex/_generated/api";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks";
-import {
-  LeafIcon,
-  LightbulbIcon,
-  BellIcon,
-  ChartBarIcon,
-  BookOpenIcon,
-  CircleNotchIcon as Loader2,
-  ArrowRightIcon,
-  StorefrontIcon,
-} from "@phosphor-icons/react";
+import { 
+  LeafIcon, 
+  LightbulbIcon, 
+  BellIcon, 
+  ChartBarIcon, 
+  BookOpenIcon, 
+  CircleNotchIcon as Loader2, 
+  ArrowRightIcon, 
+  StorefrontIcon, 
+ } from "@phosphor-icons/react";
 
 export function FarmerDashboardClient() {
   const t = useTranslations();

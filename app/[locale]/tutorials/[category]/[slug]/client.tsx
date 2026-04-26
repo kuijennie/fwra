@@ -7,7 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { StepViewer } from "@/components/tutorials";
 import { Link } from "@/lib/i18n/navigation";
 import { Badge, Button } from "@/components/ui";
-import { CaretLeft as ChevronLeft, Clock, BookOpen, Eye, Bell, CircleNotch as Loader2 } from "@phosphor-icons/react";
+import { CaretLeftIcon as ChevronLeft, ClockIcon as Clock, BookOpenIcon as BookOpen, EyeIcon as Eye, BellIcon as Bell, CircleNotchIcon as Loader2 } from "@phosphor-icons/react";
 
 interface TutorialDetailClientProps {
   slug: string;

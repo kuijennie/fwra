@@ -31,7 +31,6 @@
     "recommendations": "Mapendekezo",
     "reminders": "Vikumbusho",
     "legal": "Sheria",
-    "stories": "Hadithi",
     "reports": "Ripoti",
     "signIn": "Ingia",
     "admin": "Msimamizi",
@@ -50,8 +49,7 @@
     "browseTutorialsDesc": "Jifunze hatua kwa hatua",
     "featuredTutorials": "Mafunzo Maarufu",
     "recentActivity": "Shughuli za Hivi Karibuni",
-    "noActivity": "Hakuna shughuli za hivi karibuni",
-    "successStories": "Hadithi za Mafanikio"
+    "noActivity": "Hakuna shughuli za hivi karibuni"
   },
   "wasteInput": {
     "title": "Rekodi Taka Yako",
@@ -135,9 +133,7 @@
     "tip": "Kidokezo",
     "watchVideo": "Tazama video",
     "completeTutorial": "Maliza",
-    "noTutorials": "Hakuna mafunzo yaliyopatikana",
-    "successStories": "Hadithi za Mafanikio",
-    "fromFarmers": "kutoka kwa wakulima waliotumia njia hii"
+    "noTutorials": "Hakuna mafunzo yaliyopatikana"
   },
   "marketplace": {
     "title": "Soko",
@@ -257,27 +253,6 @@
     "signedInAs": "Umeingia kama",
     "editProfile": "Hariri Wasifu",
     "role": "Jukumu"
-  },
-  "stories": {
-    "title": "Hadithi za Mafanikio",
-    "subtitle": "Hadithi halisi kutoka kwa wakulima wa Kenya waliobadilisha taka kuwa thamani",
-    "totalStories": "Hadithi",
-    "methodsUsed": "Njia",
-    "counties": "Kaunti",
-    "allMethods": "Zote",
-    "methods": {
-      "composting": "Mboji",
-      "biogas": "Biogesi",
-      "mulching": "Kufunika Udongo",
-      "animal_feed": "Chakula cha Mifugo",
-      "vermicompost": "Mboji ya Minyoo"
-    },
-    "showingResults": "Inaonyesha hadithi {count}",
-    "noStories": "Hakuna hadithi zilizopatikana",
-    "noStoriesDescription": "Jaribu kuchagua njia tofauti",
-    "ctaTitle": "Una hadithi ya mafanikio?",
-    "ctaDescription": "Shiriki jinsi kuchakata taka za shamba kumesaidia shamba lako na uhamasisha wakulima wengine.",
-    "ctaContact": "Tuma hadithi yako kwa stories@fwra.co.ke"
   },
   "reports": {
     "title": "Ripoti za Shughuli Zako",
@@ -412,13 +387,7 @@
     "activate": "Wezesha",
     "deactivate": "Lemaza",
     "noBuyers": "Hakuna orodha za wanunuzi bado",
-    "successStories": "Hadithi za Mafanikio",
-    "storiesSubtitle": "Idhinisha au kataa mawasilisho ya wakulima",
-    "pending": "zinazosubiri",
-    "approved": "Imeidhinishwa",
-    "approve": "Idhinisha",
     "delete": "Futa",
-    "noStories": "Hakuna hadithi za mafanikio bado",
     "tutorials": "Mafunzo",
     "tutorialsSubtitle": "Chapisha au usichapisha maudhui ya mafunzo",
     "published": "Imechapishwa",
@@ -426,9 +395,7 @@
     "noTutorials": "Hakuna mafunzo bado",
     "edit": "Hariri",
     "editTutorial": "Hariri Mafunzo",
-    "editStory": "Hariri Hadithi",
     "createTutorial": "Unda Mafunzo",
-    "createStory": "Unda Hadithi",
     "titleEn": "Kichwa (Kiingereza)",
     "titleSw": "Kichwa (Kiswahili)",
     "descriptionEn": "Maelezo (Kiingereza)",
@@ -447,16 +414,9 @@
     "stepTitleSw": "Kichwa cha Hatua (Kiswahili)",
     "stepContentEn": "Maudhui ya Hatua (Kiingereza)",
     "stepContentSw": "Maudhui ya Hatua (Kiswahili)",
-    "farmerName": "Jina la Mkulima",
-    "method": "Njia",
-    "storyEn": "Hadithi (Kiingereza)",
-    "storySw": "Hadithi (Kiswahili)",
-    "resultsEn": "Matokeo (Kiingereza)",
-    "resultsSw": "Matokeo (Kiswahili)",
     "creating": "Inaunda...",
     "sending": "Inatuma...",
-    "contentTabTutorials": "Mafunzo",
-    "contentTabStories": "Hadithi"
+    "contentTabTutorials": "Mafunzo"
   },
   "roles": {
     "farmer": "Mkulima",

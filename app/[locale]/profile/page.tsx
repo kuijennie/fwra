@@ -7,7 +7,7 @@ import {
   SignInButton,
   useUser,
 } from "@clerk/nextjs";
-import { Shield, ShoppingBag, Plant as Sprout } from "@phosphor-icons/react";
+import { ShieldIcon as Shield, ShoppingBagIcon as ShoppingBag, PlantIcon as Sprout } from "@phosphor-icons/react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";

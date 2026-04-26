@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { WasteInputForm, type WasteInputData } from "@/components/forms";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks";
-import { CircleNotch as Loader2 } from "@phosphor-icons/react";
+import { CircleNotchIcon as Loader2 } from "@phosphor-icons/react";
 
 export function WasteInputPageClient() {
   const t = useTranslations();

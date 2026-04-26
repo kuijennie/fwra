@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
-import { Plant, ShoppingBag } from "@phosphor-icons/react";
+import { PlantIcon as Plant, ShoppingBagIcon as ShoppingBag } from "@phosphor-icons/react";
 
 export function RoleSelectionModal() {
   const t = useTranslations("roleSelection");

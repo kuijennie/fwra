@@ -6,18 +6,8 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { BuyerGrid, SearchFilters } from "@/components/marketplace";
 import { Badge } from "@/components/ui";
-import {
-  Storefront as Store,
-  Package,
-  MapPin,
-  Tag,
-  Phone,
-  WhatsappLogo,
-  CircleNotch as Loader2,
-  Users,
-  CheckCircle,
-  Funnel,
-} from "@phosphor-icons/react";
+import { StorefrontIcon as Store, PackageIcon as Package, MapPinIcon as MapPin, TagIcon as Tag, PhoneIcon as Phone, WhatsappLogoIcon as WhatsappLogo, CircleNotchIcon as Loader2, UsersIcon as Users, CheckCircleIcon as CheckCircle, FunnelIcon as Funnel, 
+ } from "@phosphor-icons/react";
 
 type Tab = "listings" | "buyers";
 

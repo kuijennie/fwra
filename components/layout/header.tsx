@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
-import { Leaf, List as Menu, X } from "@phosphor-icons/react";
+import { LeafIcon as Leaf, ListIcon as Menu, XIcon as X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { SignedIn, SignedOut, UserButton, SignInButton, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";

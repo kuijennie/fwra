@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { Select } from "@/components/ui";
 import { KENYA_COUNTIES } from "@/lib/constants/counties";
-import { MagnifyingGlass as Search, Funnel as Filter } from "@phosphor-icons/react";
+import { MagnifyingGlassIcon as Search, FunnelIcon as Filter } from "@phosphor-icons/react";
 
 interface SearchFiltersProps {
   searchQuery: string;

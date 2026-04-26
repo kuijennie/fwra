@@ -2,7 +2,7 @@
 
 import { forwardRef, type SelectHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-import { CaretDown as ChevronDown } from "@phosphor-icons/react";
+import { CaretDownIcon as ChevronDown } from "@phosphor-icons/react";
 
 export interface SelectOption {
   value: string;

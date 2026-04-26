@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Card, Badge, Button } from "@/components/ui";
-import { Phone, ChatCircle as MessageCircle, MapPin, Star, CheckCircle } from "@phosphor-icons/react";
+import { PhoneIcon as Phone, ChatCircleIcon as MessageCircle, MapPinIcon as MapPin, StarIcon as Star, CheckCircleIcon as CheckCircle } from "@phosphor-icons/react";
 import type { Doc } from "@/convex/_generated/dataModel";
 
 interface BuyerCardProps {

@@ -7,21 +7,21 @@ import { api } from "@/convex/_generated/api";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks";
 import { Link } from "@/lib/i18n/navigation";
-import {
-  ChartBarIcon as BarChart3,
-  LeafIcon as Leaf,
-  ScalesIcon as Scale,
-  LightbulbIcon as Lightbulb,
-  CheckCircleIcon as CheckCircle2,
-  ArrowRightIcon as ArrowRight,
-  CircleNotchIcon as Loader2,
-  ArrowsCounterClockwiseIcon as Recycle,
-  PlantIcon as Plant,
-  FireIcon as Fire,
-  BarnIcon as Barn,
-  DownloadSimpleIcon as Download,
-  type Icon,
-} from "@phosphor-icons/react";
+import { 
+  ChartBarIcon as BarChart3, 
+  LeafIcon as Leaf, 
+  ScalesIcon as Scale, 
+  LightbulbIcon as Lightbulb, 
+  CheckCircleIcon as CheckCircle2, 
+  ArrowRightIcon as ArrowRight, 
+  CircleNotchIcon as Loader2, 
+  ArrowsCounterClockwiseIcon as Recycle, 
+  PlantIcon as Plant, 
+  FireIcon as Fire, 
+  BarnIcon as Barn, 
+  DownloadSimpleIcon as Download, 
+  type Icon, 
+ } from "@phosphor-icons/react";
 import { MonthlyActivityChart } from "@/components/reports/monthly-activity-chart";
 
 function computeWeeklyActivity(entries: { createdAt: number; volumeKg: number }[]) {

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { seasons } from "@/lib/constants";
-import { Sun, CloudRain, CloudSun } from "@phosphor-icons/react";
+import { SunIcon as Sun, CloudRainIcon as CloudRain, CloudSunIcon as CloudSun } from "@phosphor-icons/react";
 
 interface SeasonSelectorProps {
   selectedSeason: string;

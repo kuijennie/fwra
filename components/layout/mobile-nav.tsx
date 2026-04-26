@@ -5,19 +5,7 @@ import { Link, usePathname } from "@/lib/i18n/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
-import {
-  House as Home,
-  Leaf,
-  BookOpen,
-  Storefront as Store,
-  User,
-  Lightbulb,
-  Shield,
-  Star,
-  Plant as Sprout,
-  ShoppingBag,
-  Tag,
-} from "@phosphor-icons/react";
+import { HouseIcon as Home, LeafIcon as Leaf, BookOpenIcon as BookOpen, StorefrontIcon as Store, UserIcon as User, LightbulbIcon as Lightbulb, ShieldIcon as Shield, PlantIcon as Sprout, ShoppingBagIcon as ShoppingBag, TagIcon as Tag } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { getMobileNavItems } from "@/lib/auth/roles";
 
@@ -30,7 +18,6 @@ const iconMap = {
   "/marketplace": Store,
   "/profile": User,
   "/recommendations": Lightbulb,
-  "/success-stories": Star,
   "/tutorials": BookOpen,
   "/waste-input": Leaf,
 } as const;

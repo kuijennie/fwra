@@ -7,17 +7,8 @@ import { useUser } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
 import { RoleGuard } from "@/components/auth/role-guard";
 import { Id } from "@/convex/_generated/dataModel";
-import {
-  Tag,
-  Phone,
-  WhatsappLogo,
-  Plus,
-  CircleNotch as Loader2,
-  CheckCircle,
-  Trash,
-  ArrowLeft,
-  Package,
-} from "@phosphor-icons/react";
+import { TagIcon as Tag, PhoneIcon as Phone, WhatsappLogoIcon as WhatsappLogo, PlusIcon as Plus, CircleNotchIcon as Loader2, CheckCircleIcon as CheckCircle, TrashIcon as Trash, ArrowLeftIcon as ArrowLeft, PackageIcon as Package, 
+ } from "@phosphor-icons/react";
 import { Link } from "@/lib/i18n/navigation";
 
 const B = "#06402B";

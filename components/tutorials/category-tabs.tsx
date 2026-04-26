@@ -2,15 +2,15 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import {
-  SquaresFourIcon,
-  PlantIcon,
-  FireIcon,
-  LeafIcon,
-  BarnIcon,
-  ArrowsCounterClockwiseIcon,
-  type Icon,
-} from "@phosphor-icons/react";
+import { 
+  SquaresFourIcon, 
+  PlantIcon, 
+  FireIcon, 
+  LeafIcon, 
+  BarnIcon, 
+  ArrowsCounterClockwiseIcon, 
+  type Icon, 
+ } from "@phosphor-icons/react";
 
 const categories: { id: string; labelKey: string; Icon: Icon }[] = [
   { id: "all",          labelKey: "tutorials.all",                Icon: SquaresFourIcon },

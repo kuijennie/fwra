@@ -3,16 +3,8 @@
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Badge, Button } from "@/components/ui";
-import {
-  Leaf,
-  Fire as Flame,
-  Drop as Droplets,
-  ArrowsCounterClockwise as Recycle,
-  Bug,
-  Clock,
-  CheckCircle,
-  CaretRight as ChevronRight,
-} from "@phosphor-icons/react";
+import { LeafIcon as Leaf, FireIcon as Flame, DropIcon as Droplets, ArrowsCounterClockwiseIcon as Recycle, BugIcon as Bug, ClockIcon as Clock, CheckCircleIcon as CheckCircle, CaretRightIcon as ChevronRight, 
+ } from "@phosphor-icons/react";
 import type { Id } from "@/convex/_generated/dataModel";
 
 interface Recommendation {

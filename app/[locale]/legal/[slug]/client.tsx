@@ -6,12 +6,12 @@ import { api } from "@/convex/_generated/api";
 import { Link } from "@/lib/i18n/navigation";
 import { Badge } from "@/components/ui";
 import ReactMarkdown from "react-markdown";
-import {
-  ArrowLeftIcon as ArrowLeft,
-  CalendarBlankIcon as Calendar,
-  CircleNotchIcon as Loader2,
-  WarningIcon as AlertTriangle,
-} from "@phosphor-icons/react";
+import { 
+  ArrowLeftIcon as ArrowLeft, 
+  CalendarBlankIcon as Calendar, 
+  CircleNotchIcon as Loader2, 
+  WarningIcon as AlertTriangle, 
+ } from "@phosphor-icons/react";
 
 const categoryColors: Record<string, "info" | "success" | "warning"> = {
   waste_management_act: "info",

@@ -8,7 +8,7 @@ import { RoleGuard } from "@/components/auth/role-guard";
 import { useSession } from "@/lib/hooks";
 import { Link, useRouter } from "@/lib/i18n/navigation";
 import { Button } from "@/components/ui";
-import { CircleNotch as Loader2, Plus } from "@phosphor-icons/react";
+import { CircleNotchIcon as Loader2, PlusIcon as Plus } from "@phosphor-icons/react";
 import type { Id } from "@/convex/_generated/dataModel";
 
 // Map method IDs to tutorial category slugs

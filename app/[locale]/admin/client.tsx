@@ -18,17 +18,14 @@ import {
   ShieldWarningIcon as ShieldAlert,
   MagnifyingGlassIcon as Search,
   BookOpenIcon as BookOpen,
-  StarIcon as Star,
   PaperPlaneTiltIcon as PaperPlaneTilt,
   PlusIcon as Plus,
   TrashIcon as Trash,
-  CheckCircleIcon as CheckCircle,
   PencilSimpleIcon as PencilSimple,
 } from "@phosphor-icons/react";
 import { Id } from "@/convex/_generated/dataModel";
 
 type Tab = "overview" | "users" | "content";
-type ContentSubTab = "tutorials" | "stories";
 
 const B = "#06402B";
 const B10 = "rgba(6,64,43,0.10)";
@@ -52,23 +49,12 @@ const emptyTutorialForm = () => ({
   steps: [{ titleEn: "", titleSw: "", contentEn: "", contentSw: "" }] as StepDraft[],
 });
 
-const emptyStoryForm = () => ({
-  farmerName: "",
-  county: "nairobi",
-  method: "composting",
-  storyEn: "",
-  storySw: "",
-  resultsEn: "",
-  resultsSw: "",
-});
-
 export function AdminDashboardClient() {
   const t = useTranslations();
   const { user: clerkUser } = useUser();
   const adminEmail = clerkUser?.primaryEmailAddress?.emailAddress;
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [userSearch, setUserSearch] = useState("");
-  const [contentSubTab, setContentSubTab] = useState<ContentSubTab>("tutorials");
 
   // Tutorial form state
   const [showCreateTutorial, setShowCreateTutorial] = useState(false);
@@ -76,12 +62,6 @@ export function AdminDashboardClient() {
   const [tutorialForm, setTutorialForm] = useState(emptyTutorialForm());
   const [savingTutorial, setSavingTutorial] = useState(false);
   const [tutorialError, setTutorialError] = useState<string | null>(null);
-
-  // Story form state
-  const [showCreateStory, setShowCreateStory] = useState(false);
-  const [editingStoryId, setEditingStoryId] = useState<Id<"successStories"> | null>(null);
-  const [storyForm, setStoryForm] = useState(emptyStoryForm());
-  const [savingStory, setSavingStory] = useState(false);
 
   // Email state: maps item ID → { sending, result }
   const [emailState, setEmailState] = useState<Record<string, { sending: boolean; sent?: number; error?: string }>>({});
@@ -100,7 +80,6 @@ export function AdminDashboardClient() {
   const users = usersJwt ?? usersFallback;
 
   const tutorials = useQuery(api.tutorials.adminListAll, useFallback ? { adminEmail: adminEmail! } : {});
-  const stories = useQuery(api.successStories.adminListAll, useFallback ? { adminEmail: adminEmail! } : {});
 
   const updateRole = useMutation(api.users.updateRole);
   const updateRoleByEmail = useMutation(api.users.updateRoleByEmail);
@@ -108,12 +87,7 @@ export function AdminDashboardClient() {
   const updateTutorial = useMutation(api.tutorials.adminUpdate);
   const deleteTutorial = useMutation(api.tutorials.adminDelete);
   const setPublished = useMutation(api.tutorials.adminSetPublished);
-  const createStory = useMutation(api.successStories.adminCreate);
-  const updateStory = useMutation(api.successStories.adminUpdate);
-  const setApproved = useMutation(api.successStories.adminSetApproved);
-  const deleteStory = useMutation(api.successStories.adminDelete);
   const sendTutorialEmail = useAction(api.email.sendTutorialEmail);
-  const sendStoryEmail = useAction(api.email.sendStoryEmail);
 
   if (currentUser === undefined || (adminEmail && fallbackUser === undefined)) {
     return (
@@ -151,9 +125,7 @@ export function AdminDashboardClient() {
   });
 
   const handleRoleChange = (userId: Id<"users">, role: string) => {
-    if (useFallback) {
-      return updateRoleByEmail({ adminEmail: adminEmail!, userId, role });
-    }
+    if (useFallback) return updateRoleByEmail({ adminEmail: adminEmail!, userId, role });
     return updateRole({ userId, role });
   };
 
@@ -205,10 +177,13 @@ export function AdminDashboardClient() {
       if (editingTutorialId) {
         await updateTutorial({ id: editingTutorialId, ...payload, ...fallback });
       } else {
-        const slug = tutorialForm.titleEn
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
+        const slug =
+          tutorialForm.titleEn
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "") +
+          "-" +
+          Date.now();
         await createTutorial({ slug, ...payload, ...fallback });
       }
       closeTutorialForm();
@@ -244,65 +219,10 @@ export function AdminDashboardClient() {
     await deleteTutorial({ id, ...(useFallback ? { adminEmail: adminEmail! } : {}) });
   };
 
-  // ── Story handlers ────────────────────────────────────────────────────────
-  const closeStoryForm = () => {
-    setShowCreateStory(false);
-    setEditingStoryId(null);
-    setStoryForm(emptyStoryForm());
-  };
-
-  const handleSaveStory = async () => {
-    if (!storyForm.farmerName || !storyForm.storyEn || !storyForm.storySw) return;
-    setSavingStory(true);
-    try {
-      const payload = {
-        farmerName: storyForm.farmerName,
-        county: storyForm.county,
-        method: storyForm.method,
-        story: { en: storyForm.storyEn, sw: storyForm.storySw },
-        results: { en: storyForm.resultsEn, sw: storyForm.resultsSw },
-      };
-      const fallback = useFallback ? { adminEmail: adminEmail! } : {};
-      if (editingStoryId) {
-        await updateStory({ id: editingStoryId, ...payload, ...fallback });
-      } else {
-        await createStory({ ...payload, ...fallback });
-      }
-      closeStoryForm();
-    } finally {
-      setSavingStory(false);
-    }
-  };
-
-  const handleEditStory = (story: NonNullable<typeof stories>[number]) => {
-    setStoryForm({
-      farmerName: story.farmerName,
-      county: story.county,
-      method: story.method,
-      storyEn: story.story.en,
-      storySw: story.story.sw,
-      resultsEn: story.results.en,
-      resultsSw: story.results.sw,
-    });
-    setEditingStoryId(story._id);
-    setShowCreateStory(true);
-  };
-
-  // ── Email handlers ────────────────────────────────────────────────────────
   const handleSendTutorialEmail = async (id: Id<"tutorials">) => {
     setEmailState((s) => ({ ...s, [id]: { sending: true } }));
     try {
       const result = await sendTutorialEmail({ tutorialId: id });
-      setEmailState((s) => ({ ...s, [id]: { sending: false, sent: result.sent } }));
-    } catch (e) {
-      setEmailState((s) => ({ ...s, [id]: { sending: false, error: (e as Error).message } }));
-    }
-  };
-
-  const handleSendStoryEmail = async (id: Id<"successStories">) => {
-    setEmailState((s) => ({ ...s, [id]: { sending: true } }));
-    try {
-      const result = await sendStoryEmail({ storyId: id });
       setEmailState((s) => ({ ...s, [id]: { sending: false, sent: result.sent } }));
     } catch (e) {
       setEmailState((s) => ({ ...s, [id]: { sending: false, error: (e as Error).message } }));
@@ -448,330 +368,175 @@ export function AdminDashboardClient() {
 
         {/* ── Content ────────────────────────────────────────────────────── */}
         {activeTab === "content" && (
-          <div className="space-y-6">
-            {/* Content sub-tabs */}
-            <div className="flex gap-1 rounded-xl p-1 w-fit" style={{ background: B06 }}>
-              {([
-                { id: "tutorials" as const, label: t("admin.contentTabTutorials"), icon: <BookOpen weight="duotone" className="h-4 w-4" /> },
-                { id: "stories" as const, label: t("admin.contentTabStories"), icon: <Star weight="duotone" className="h-4 w-4" /> },
-              ] as const).map((sub) => (
-                <button
-                  key={sub.id}
-                  onClick={() => setContentSubTab(sub.id)}
-                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                  style={contentSubTab === sub.id ? { background: SUR, color: B } : { color: FGM }}
-                >
-                  {sub.icon}
-                  {sub.label}
-                </button>
-              ))}
+          <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
+            <div className="flex items-center border-b px-6 py-4" style={{ borderColor: BRD }}>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.tutorials")}</h2>
+                <p className="text-xs mt-0.5" style={{ color: FGM }}>{t("admin.tutorialsSubtitle")}</p>
+              </div>
+              <button
+                onClick={() => setShowCreateTutorial((v) => !v)}
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
+                style={{ background: B, color: "#fff" }}
+              >
+                <Plus weight="bold" className="h-4 w-4" />
+                {t("admin.createTutorial")}
+              </button>
             </div>
 
-            {/* ── Tutorials panel ─────────────────────────────────────────── */}
-            {contentSubTab === "tutorials" && (
-              <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
-                <div className="flex items-center border-b px-6 py-4" style={{ borderColor: BRD }}>
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.tutorials")}</h2>
-                    <p className="text-xs mt-0.5" style={{ color: FGM }}>{t("admin.tutorialsSubtitle")}</p>
-                  </div>
-                  <button
-                    onClick={() => { setShowCreateTutorial((v) => !v); }}
-                    className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
-                    style={{ background: B, color: "#fff" }}
-                  >
-                    <Plus weight="bold" className="h-4 w-4" />
-                    {t("admin.createTutorial")}
-                  </button>
-                </div>
-
-                {/* Create tutorial form */}
-                {showCreateTutorial && (
-                  <div className="border-b px-6 py-6 space-y-4" style={{ borderColor: BRD, background: B06 }}>
-                    <h3 className="text-sm font-semibold" style={{ color: FG }}>{editingTutorialId ? t("admin.editTutorial") : t("admin.createTutorial")}</h3>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <FormField label={t("admin.titleEn")}>
-                        <input value={tutorialForm.titleEn} onChange={(e) => setTutorialForm((f) => ({ ...f, titleEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                      </FormField>
-                      <FormField label={t("admin.titleSw")}>
-                        <input value={tutorialForm.titleSw} onChange={(e) => setTutorialForm((f) => ({ ...f, titleSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                      </FormField>
-                      <FormField label={t("admin.descriptionEn")}>
-                        <textarea rows={2} value={tutorialForm.descEn} onChange={(e) => setTutorialForm((f) => ({ ...f, descEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                      </FormField>
-                      <FormField label={t("admin.descriptionSw")}>
-                        <textarea rows={2} value={tutorialForm.descSw} onChange={(e) => setTutorialForm((f) => ({ ...f, descSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                      </FormField>
-                      <FormField label={t("admin.category")}>
-                        <select value={tutorialForm.category} onChange={(e) => setTutorialForm((f) => ({ ...f, category: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
-                          {["composting", "biogas", "mulching", "animal_feed", "vermicompost"].map((c) => (
-                            <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
-                          ))}
-                        </select>
-                      </FormField>
-                      <FormField label={t("admin.difficulty")}>
-                        <select value={tutorialForm.difficulty} onChange={(e) => setTutorialForm((f) => ({ ...f, difficulty: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
-                          {["beginner", "intermediate", "advanced"].map((d) => (
-                            <option key={d} value={d}>{d}</option>
-                          ))}
-                        </select>
-                      </FormField>
-                      <FormField label={t("admin.duration")}>
-                        <input placeholder="e.g. 2–3 hours" value={tutorialForm.duration} onChange={(e) => setTutorialForm((f) => ({ ...f, duration: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                      </FormField>
-                    </div>
-
-                    {/* Steps */}
-                    <div className="space-y-3">
-                      <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: FGM }}>Steps</p>
-                      {tutorialForm.steps.map((step, i) => (
-                        <div key={i} className="rounded-xl border p-4 space-y-3" style={{ background: SUR, borderColor: BRD }}>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold" style={{ color: B }}>Step {i + 1}</span>
-                            {tutorialForm.steps.length > 1 && (
-                              <button onClick={() => removeStep(i)} className="text-xs" style={{ color: FGM }}>
-                                {t("admin.removeStep")}
-                              </button>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            <FormField label={t("admin.stepTitleEn")}>
-                              <input value={step.titleEn} onChange={(e) => updateStep(i, "titleEn", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                            </FormField>
-                            <FormField label={t("admin.stepTitleSw")}>
-                              <input value={step.titleSw} onChange={(e) => updateStep(i, "titleSw", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                            </FormField>
-                            <FormField label={t("admin.stepContentEn")}>
-                              <textarea rows={2} value={step.contentEn} onChange={(e) => updateStep(i, "contentEn", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                            </FormField>
-                            <FormField label={t("admin.stepContentSw")}>
-                              <textarea rows={2} value={step.contentSw} onChange={(e) => updateStep(i, "contentSw", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                            </FormField>
-                          </div>
-                        </div>
+            {/* Create tutorial form */}
+            {showCreateTutorial && (
+              <div className="border-b px-6 py-6 space-y-4" style={{ borderColor: BRD, background: B06 }}>
+                <h3 className="text-sm font-semibold" style={{ color: FG }}>{editingTutorialId ? t("admin.editTutorial") : t("admin.createTutorial")}</h3>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <FormField label={t("admin.titleEn")}>
+                    <input value={tutorialForm.titleEn} onChange={(e) => setTutorialForm((f) => ({ ...f, titleEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                  </FormField>
+                  <FormField label={t("admin.titleSw")}>
+                    <input value={tutorialForm.titleSw} onChange={(e) => setTutorialForm((f) => ({ ...f, titleSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                  </FormField>
+                  <FormField label={t("admin.descriptionEn")}>
+                    <textarea rows={2} value={tutorialForm.descEn} onChange={(e) => setTutorialForm((f) => ({ ...f, descEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                  </FormField>
+                  <FormField label={t("admin.descriptionSw")}>
+                    <textarea rows={2} value={tutorialForm.descSw} onChange={(e) => setTutorialForm((f) => ({ ...f, descSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                  </FormField>
+                  <FormField label={t("admin.category")}>
+                    <select value={tutorialForm.category} onChange={(e) => setTutorialForm((f) => ({ ...f, category: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
+                      {["composting", "biogas", "mulching", "animal_feed", "vermicompost"].map((c) => (
+                        <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
                       ))}
-                      <button onClick={addStep} className="flex items-center gap-1.5 text-sm font-medium" style={{ color: B }}>
-                        <Plus weight="bold" className="h-3.5 w-3.5" />
-                        {t("admin.addStep")}
-                      </button>
+                    </select>
+                  </FormField>
+                  <FormField label={t("admin.difficulty")}>
+                    <select value={tutorialForm.difficulty} onChange={(e) => setTutorialForm((f) => ({ ...f, difficulty: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
+                      {["beginner", "intermediate", "advanced"].map((d) => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </FormField>
+                  <FormField label={t("admin.duration")}>
+                    <input placeholder="e.g. 2–3 hours" value={tutorialForm.duration} onChange={(e) => setTutorialForm((f) => ({ ...f, duration: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                  </FormField>
+                </div>
+
+                {/* Steps */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: FGM }}>Steps</p>
+                  {tutorialForm.steps.map((step, i) => (
+                    <div key={i} className="rounded-xl border p-4 space-y-3" style={{ background: SUR, borderColor: BRD }}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold" style={{ color: B }}>Step {i + 1}</span>
+                        {tutorialForm.steps.length > 1 && (
+                          <button onClick={() => removeStep(i)} className="text-xs" style={{ color: FGM }}>
+                            {t("admin.removeStep")}
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <FormField label={t("admin.stepTitleEn")}>
+                          <input value={step.titleEn} onChange={(e) => updateStep(i, "titleEn", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                        </FormField>
+                        <FormField label={t("admin.stepTitleSw")}>
+                          <input value={step.titleSw} onChange={(e) => updateStep(i, "titleSw", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
+                        </FormField>
+                        <FormField label={t("admin.stepContentEn")}>
+                          <textarea rows={2} value={step.contentEn} onChange={(e) => updateStep(i, "contentEn", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                        </FormField>
+                        <FormField label={t("admin.stepContentSw")}>
+                          <textarea rows={2} value={step.contentSw} onChange={(e) => updateStep(i, "contentSw", e.target.value)} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
+                        </FormField>
+                      </div>
                     </div>
-
-                    {tutorialError && (
-                      <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-400">
-                        {tutorialError}
-                      </p>
-                    )}
-
-                    <div className="flex gap-3 pt-2">
-                      <button onClick={handleSaveTutorial} disabled={savingTutorial} className="rounded-lg px-5 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: B, color: "#fff" }}>
-                        {savingTutorial ? t("admin.creating") : editingTutorialId ? t("common.save") : t("admin.saveDraft")}
-                      </button>
-                      <button onClick={closeTutorialForm} className="rounded-lg px-5 py-2 text-sm font-medium" style={{ color: FGM }}>
-                        {t("common.cancel")}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Tutorials list */}
-                {tutorials && tutorials.length > 0 ? (
-                  <div className="divide-y" style={{ borderColor: BRD }}>
-                    {tutorials.map((tut) => {
-                      const es = emailState[tut._id];
-                      return (
-                        <div key={tut._id} className="flex flex-wrap items-center gap-3 px-6 py-4">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate" style={{ color: FG }}>{tut.title.en}</p>
-                            <p className="text-xs mt-0.5 capitalize" style={{ color: FGM }}>
-                              {tut.category.replace(/_/g, " ")} · {tut.difficulty} · {tut.steps.length} steps
-                            </p>
-                          </div>
-                          <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={tut.isPublished ? { background: "#dcfce7", color: "#166534" } : { background: B06, color: FGM }}>
-                            {tut.isPublished ? t("admin.published") : t("admin.unpublished")}
-                          </span>
-                          <button
-                            onClick={() => handleEditTutorial(tut)}
-                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
-                            style={{ borderColor: BRD, color: FG, background: SUR }}
-                          >
-                            <PencilSimple weight="duotone" className="h-3.5 w-3.5" />
-                            {t("admin.edit")}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteTutorial(tut._id)}
-                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
-                            style={{ borderColor: BRD, color: "#dc2626", background: SUR }}
-                          >
-                            <Trash weight="duotone" className="h-3.5 w-3.5" />
-                            {t("admin.delete")}
-                          </button>
-                          <button
-                            onClick={() => setPublished({ id: tut._id, isPublished: !tut.isPublished, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
-                            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
-                            style={{ borderColor: BRD, color: FG, background: SUR }}
-                          >
-                            {tut.isPublished ? t("admin.unpublish") : t("admin.publish")}
-                          </button>
-                          <button
-                            onClick={() => handleSendTutorialEmail(tut._id)}
-                            disabled={es?.sending}
-                            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50 transition-colors"
-                            style={{ background: B10, color: B }}
-                          >
-                            {es?.sending
-                              ? <Loader2 weight="duotone" className="h-3.5 w-3.5 animate-spin" />
-                              : <PaperPlaneTilt weight="duotone" className="h-3.5 w-3.5" />
-                            }
-                            {es?.sending ? t("admin.sending") : t("admin.sendEmail")}
-                          </button>
-                          {es?.sent !== undefined && (
-                            <span className="text-xs" style={{ color: "#166534" }}>✓ {t("admin.emailSent", { count: es.sent })}</span>
-                          )}
-                          {es?.error && (
-                            <span className="text-xs text-red-500 max-w-xs truncate" title={es.error}>{es.error}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <EmptyState text={t("admin.noTutorials")} />
-                )}
-              </section>
-            )}
-
-            {/* ── Stories panel ────────────────────────────────────────────── */}
-            {contentSubTab === "stories" && (
-              <section className="overflow-hidden rounded-2xl border" style={{ background: SUR, borderColor: BRD }}>
-                <div className="flex items-center border-b px-6 py-4" style={{ borderColor: BRD }}>
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold" style={{ color: FG }}>{t("admin.successStories")}</h2>
-                    <p className="text-xs mt-0.5" style={{ color: FGM }}>{t("admin.storiesSubtitle")}</p>
-                  </div>
-                  <button
-                    onClick={() => setShowCreateStory((v) => !v)}
-                    className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
-                    style={{ background: B, color: "#fff" }}
-                  >
-                    <Plus weight="bold" className="h-4 w-4" />
-                    {t("admin.createStory")}
+                  ))}
+                  <button onClick={addStep} className="flex items-center gap-1.5 text-sm font-medium" style={{ color: B }}>
+                    <Plus weight="bold" className="h-3.5 w-3.5" />
+                    {t("admin.addStep")}
                   </button>
                 </div>
 
-                {/* Create story form */}
-                {showCreateStory && (
-                  <div className="border-b px-6 py-6 space-y-4" style={{ borderColor: BRD, background: B06 }}>
-                    <h3 className="text-sm font-semibold" style={{ color: FG }}>{editingStoryId ? t("admin.editStory") : t("admin.createStory")}</h3>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <FormField label={t("admin.farmerName")}>
-                        <input value={storyForm.farmerName} onChange={(e) => setStoryForm((f) => ({ ...f, farmerName: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                      </FormField>
-                      <FormField label={t("admin.method")}>
-                        <select value={storyForm.method} onChange={(e) => setStoryForm((f) => ({ ...f, method: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none">
-                          {["composting", "biogas", "mulching", "animal_feed", "vermicompost"].map((m) => (
-                            <option key={m} value={m}>{m.replace(/_/g, " ")}</option>
-                          ))}
-                        </select>
-                      </FormField>
-                      <FormField label={t("admin.colCounty")}>
-                        <input value={storyForm.county} onChange={(e) => setStoryForm((f) => ({ ...f, county: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none" />
-                      </FormField>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <FormField label={t("admin.storyEn")}>
-                        <textarea rows={4} value={storyForm.storyEn} onChange={(e) => setStoryForm((f) => ({ ...f, storyEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                      </FormField>
-                      <FormField label={t("admin.storySw")}>
-                        <textarea rows={4} value={storyForm.storySw} onChange={(e) => setStoryForm((f) => ({ ...f, storySw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                      </FormField>
-                      <FormField label={t("admin.resultsEn")}>
-                        <textarea rows={3} value={storyForm.resultsEn} onChange={(e) => setStoryForm((f) => ({ ...f, resultsEn: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                      </FormField>
-                      <FormField label={t("admin.resultsSw")}>
-                        <textarea rows={3} value={storyForm.resultsSw} onChange={(e) => setStoryForm((f) => ({ ...f, resultsSw: e.target.value }))} style={{ borderColor: BRD, background: BG, color: FG }} className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none resize-none" />
-                      </FormField>
-                    </div>
-                    <div className="flex gap-3 pt-2">
-                      <button onClick={handleSaveStory} disabled={savingStory} className="rounded-lg px-5 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: B, color: "#fff" }}>
-                        {savingStory ? t("admin.creating") : t("common.save")}
-                      </button>
-                      <button onClick={closeStoryForm} className="rounded-lg px-5 py-2 text-sm font-medium" style={{ color: FGM }}>
-                        {t("common.cancel")}
-                      </button>
-                    </div>
-                  </div>
+                {tutorialError && (
+                  <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-400">
+                    {tutorialError}
+                  </p>
                 )}
 
-                {/* Stories list */}
-                {stories && stories.length > 0 ? (
-                  <div className="divide-y" style={{ borderColor: BRD }}>
-                    {stories.map((story) => {
-                      const es = emailState[story._id];
-                      return (
-                        <div key={story._id} className="flex flex-wrap items-center gap-3 px-6 py-4">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium" style={{ color: FG }}>{story.farmerName}</p>
-                            <p className="text-xs mt-0.5 capitalize" style={{ color: FGM }}>
-                              {story.method.replace(/_/g, " ")} · {story.county.replace(/_/g, " ")}
-                            </p>
-                          </div>
-                          <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={story.isApproved ? { background: "#dcfce7", color: "#166534" } : { background: "#fef9c3", color: "#854d0e" }}>
-                            {story.isApproved ? t("admin.approved") : t("admin.pending")}
-                          </span>
-                          {!story.isApproved && (
-                            <button
-                              onClick={() => setApproved({ id: story._id, isApproved: true, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
-                              className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
-                              style={{ borderColor: BRD, color: "#166534", background: SUR }}
-                            >
-                              <CheckCircle weight="duotone" className="h-3.5 w-3.5" />
-                              {t("admin.approve")}
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleEditStory(story)}
-                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
-                            style={{ borderColor: BRD, color: FG, background: SUR }}
-                          >
-                            <PencilSimple weight="duotone" className="h-3.5 w-3.5" />
-                            {t("admin.edit")}
-                          </button>
-                          <button
-                            onClick={() => deleteStory({ id: story._id, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
-                            className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
-                            style={{ borderColor: BRD, color: "#dc2626", background: SUR }}
-                          >
-                            <Trash weight="duotone" className="h-3.5 w-3.5" />
-                            {t("admin.delete")}
-                          </button>
-                          <button
-                            onClick={() => handleSendStoryEmail(story._id)}
-                            disabled={es?.sending}
-                            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
-                            style={{ background: B10, color: B }}
-                          >
-                            {es?.sending
-                              ? <Loader2 weight="duotone" className="h-3.5 w-3.5 animate-spin" />
-                              : <PaperPlaneTilt weight="duotone" className="h-3.5 w-3.5" />
-                            }
-                            {es?.sending ? t("admin.sending") : t("admin.sendEmail")}
-                          </button>
-                          {es?.sent !== undefined && (
-                            <span className="text-xs" style={{ color: "#166534" }}>✓ {t("admin.emailSent", { count: es.sent })}</span>
-                          )}
-                          {es?.error && (
-                            <span className="text-xs text-red-500 max-w-xs truncate" title={es.error}>{es.error}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <EmptyState text={t("admin.noStories")} />
-                )}
-              </section>
+                <div className="flex gap-3 pt-2">
+                  <button onClick={handleSaveTutorial} disabled={savingTutorial} className="rounded-lg px-5 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: B, color: "#fff" }}>
+                    {savingTutorial ? t("admin.creating") : editingTutorialId ? t("common.save") : t("admin.saveDraft")}
+                  </button>
+                  <button onClick={closeTutorialForm} className="rounded-lg px-5 py-2 text-sm font-medium" style={{ color: FGM }}>
+                    {t("common.cancel")}
+                  </button>
+                </div>
+              </div>
             )}
-          </div>
+
+            {/* Tutorials list */}
+            {tutorials && tutorials.length > 0 ? (
+              <div className="divide-y" style={{ borderColor: BRD }}>
+                {tutorials.map((tut) => {
+                  const es = emailState[tut._id];
+                  return (
+                    <div key={tut._id} className="flex flex-wrap items-center gap-3 px-6 py-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: FG }}>{tut.title.en}</p>
+                        <p className="text-xs mt-0.5 capitalize" style={{ color: FGM }}>
+                          {tut.category.replace(/_/g, " ")} · {tut.difficulty} · {tut.steps.length} steps
+                        </p>
+                      </div>
+                      <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={tut.isPublished ? { background: "#dcfce7", color: "#166534" } : { background: B06, color: FGM }}>
+                        {tut.isPublished ? t("admin.published") : t("admin.unpublished")}
+                      </span>
+                      <button
+                        onClick={() => handleEditTutorial(tut)}
+                        className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                        style={{ borderColor: BRD, color: FG, background: SUR }}
+                      >
+                        <PencilSimple weight="duotone" className="h-3.5 w-3.5" />
+                        {t("admin.edit")}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTutorial(tut._id)}
+                        className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-medium"
+                        style={{ borderColor: BRD, color: "#dc2626", background: SUR }}
+                      >
+                        <Trash weight="duotone" className="h-3.5 w-3.5" />
+                        {t("admin.delete")}
+                      </button>
+                      <button
+                        onClick={() => setPublished({ id: tut._id, isPublished: !tut.isPublished, ...(useFallback ? { adminEmail: adminEmail! } : {}) })}
+                        className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                        style={{ borderColor: BRD, color: FG, background: SUR }}
+                      >
+                        {tut.isPublished ? t("admin.unpublish") : t("admin.publish")}
+                      </button>
+                      <button
+                        onClick={() => handleSendTutorialEmail(tut._id)}
+                        disabled={es?.sending}
+                        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50 transition-colors"
+                        style={{ background: B10, color: B }}
+                      >
+                        {es?.sending
+                          ? <Loader2 weight="duotone" className="h-3.5 w-3.5 animate-spin" />
+                          : <PaperPlaneTilt weight="duotone" className="h-3.5 w-3.5" />
+                        }
+                        {es?.sending ? t("admin.sending") : t("admin.sendEmail")}
+                      </button>
+                      {es?.sent !== undefined && (
+                        <span className="text-xs" style={{ color: "#166534" }}>✓ {t("admin.emailSent", { count: es.sent })}</span>
+                      )}
+                      {es?.error && (
+                        <span className="text-xs text-red-500 max-w-xs truncate" title={es.error}>{es.error}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState text={t("admin.noTutorials")} />
+            )}
+          </section>
         )}
       </div>
     </main>

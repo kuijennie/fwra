@@ -3,18 +3,18 @@
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Badge } from "@/components/ui";
-import {
-  ClockIcon,
-  BookOpenIcon,
-  EyeIcon,
-  PlantIcon,
-  FireIcon,
-  LeafIcon,
-  BarnIcon,
-  ArrowsCounterClockwiseIcon,
-  SquaresFourIcon,
-  type Icon,
-} from "@phosphor-icons/react";
+import { 
+  ClockIcon, 
+  BookOpenIcon, 
+  EyeIcon, 
+  PlantIcon, 
+  FireIcon, 
+  LeafIcon, 
+  BarnIcon, 
+  ArrowsCounterClockwiseIcon, 
+  SquaresFourIcon, 
+  type Icon, 
+ } from "@phosphor-icons/react";
 
 interface TutorialCardProps {
   slug: string;

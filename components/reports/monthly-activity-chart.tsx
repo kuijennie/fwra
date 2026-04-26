@@ -12,7 +12,7 @@ import {
   Cell,
   LabelList,
 } from "recharts";
-import { TrendUp as TrendingUp, TrendDown as TrendingDown, Minus } from "@phosphor-icons/react";
+import { TrendUpIcon as TrendingUp, TrendDownIcon as TrendingDown, MinusIcon as Minus } from "@phosphor-icons/react";
 
 type WeeklyData = { week: string; count: number; volumeKg: number };
 

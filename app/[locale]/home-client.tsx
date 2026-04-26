@@ -4,16 +4,16 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "convex/react";
 import { Link } from "@/lib/i18n/navigation";
 import { api } from "@/convex/_generated/api";
-import {
-  LeafIcon,
-  LightbulbIcon,
-  BookOpenIcon,
-  ArrowRightIcon,
-  PlantIcon,
-  DropIcon,
-  FireIcon,
-  ScalesIcon,
-} from "@phosphor-icons/react";
+import { 
+  LeafIcon, 
+  LightbulbIcon, 
+  BookOpenIcon, 
+  ArrowRightIcon, 
+  PlantIcon, 
+  DropIcon, 
+  FireIcon, 
+  ScalesIcon, 
+ } from "@phosphor-icons/react";
 
 export function HomeContent() {
   const t = useTranslations();

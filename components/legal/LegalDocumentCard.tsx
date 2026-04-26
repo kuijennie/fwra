@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 import { Link } from "@/lib/i18n/navigation";
 import { Card, Badge } from "@/components/ui";
-import { FileText, CaretRight as ChevronRight, CalendarBlank as Calendar } from "@phosphor-icons/react";
+import { FileTextIcon as FileText, CaretRightIcon as ChevronRight, CalendarBlankIcon as Calendar } from "@phosphor-icons/react";
 import type { Doc } from "@/convex/_generated/dataModel";
 
 interface LegalDocumentCardProps {

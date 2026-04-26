@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LegalDocumentList } from "@/components/legal";
-import { ScalesIcon as Scale } from "@phosphor-icons/react";
+import {  ScalesIcon as Scale  } from "@phosphor-icons/react";
 
 export function LegalClient() {
   const t = useTranslations();

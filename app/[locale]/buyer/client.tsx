@@ -5,17 +5,8 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { RoleGuard } from "@/components/auth/role-guard";
-import {
-  ShoppingBag,
-  Phone,
-  WhatsappLogo,
-  CircleNotch as Loader2,
-  Package,
-  MapPin,
-  Tag,
-  Funnel,
-  ArrowRight,
-} from "@phosphor-icons/react";
+import { ShoppingBagIcon as ShoppingBag, PhoneIcon as Phone, WhatsappLogoIcon as WhatsappLogo, CircleNotchIcon as Loader2, PackageIcon as Package, MapPinIcon as MapPin, TagIcon as Tag, FunnelIcon as Funnel, ArrowRightIcon as ArrowRight, 
+ } from "@phosphor-icons/react";
 
 
 const PRODUCT_TYPES = [

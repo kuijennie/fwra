@@ -2,18 +2,18 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import {
-  GrainsIcon,
-  BarnIcon,
-  ForkKnifeIcon,
-  ArrowsCounterClockwiseIcon,
-  PlantIcon,
-  LeafIcon,
-  DropIcon,
-  CoffeeIcon,
-  FlowerIcon,
-  type Icon,
-} from "@phosphor-icons/react";
+import { 
+  GrainsIcon, 
+  BarnIcon, 
+  ForkKnifeIcon, 
+  ArrowsCounterClockwiseIcon, 
+  PlantIcon, 
+  LeafIcon, 
+  DropIcon, 
+  CoffeeIcon, 
+  FlowerIcon, 
+  type Icon, 
+ } from "@phosphor-icons/react";
 import {
   wasteCategories,
   getWasteSubTypesByCategory,

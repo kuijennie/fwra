@@ -2,14 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import {
-  DropIcon,
-  HardHatIcon,
-  CubeIcon,
-  HouseIcon,
-  RulerIcon,
-  type Icon,
-} from "@phosphor-icons/react";
+import { 
+  DropIcon, 
+  HardHatIcon, 
+  CubeIcon, 
+  HouseIcon, 
+  RulerIcon, 
+  type Icon, 
+ } from "@phosphor-icons/react";
 import { availableResources } from "@/lib/constants";
 
 const resourceIconMap: Record<string, Icon> = {

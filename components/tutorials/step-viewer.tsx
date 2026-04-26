@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
-import { CaretLeft as ChevronLeft, CaretRight as ChevronRight, Lightbulb, Check } from "@phosphor-icons/react";
+import { CaretLeftIcon as ChevronLeft, CaretRightIcon as ChevronRight, LightbulbIcon as Lightbulb, CheckIcon as Check } from "@phosphor-icons/react";
 
 interface Step {
   stepNumber: number;

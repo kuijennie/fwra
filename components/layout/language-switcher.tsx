@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/lib/i18n/navigation";
 import { locales, localeNames, type Locale } from "@/lib/i18n/config";
-import { Globe, CaretDown as ChevronDown } from "@phosphor-icons/react";
+import { GlobeIcon as Globe, CaretDownIcon as ChevronDown } from "@phosphor-icons/react";
 import { useState, useRef, useEffect } from "react";
 
 export function LanguageSwitcher() {
